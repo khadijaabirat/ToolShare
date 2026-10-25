@@ -1,15 +1,9 @@
 require('dotenv').config();
 
-const express = require('express');
 const mongoose = require('mongoose');
-
-const app = express();
+const app = require('./src/app');
 const port = Number(process.env.PORT) || 3000;
 const mongoUri = process.env.MONGO_URI || 'mongodb://localhost:27017/toolshare';
-
-app.get('/health', (req, res) => {
-  res.json({ status: 'ok', database: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected' });
-});
 
 async function connectToMongo() {
   const maxAttempts = 10;
