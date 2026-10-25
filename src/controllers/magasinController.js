@@ -88,6 +88,19 @@ next(error);
     }
     
 }
+
+async function getActive(req,res,next) {
+    try{
+        const magasins=await magasinService.getMagasinActive();
+          return res.status(200).json({
+        success:true,
+        data:magasins
+    });
+
+    }catch(error){
+next(error);
+    }
+}
 module.exports={
-    create,getAll,getById,update,desactive,assignMagasin
+    create,getAll,getById,update,desactive,assignMagasin,getActive
 }
