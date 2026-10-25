@@ -81,5 +81,9 @@ async assignGestionaireToMagasin(magasinId,gestionnaireId){
     }
     return userRepository.assignMagasin(gestionnaireId,magasinId);
 }
+
+async getMagasinActive(){
+return await magasinRepository.getMagasinActive();
+}
 }
 module.exports=new magasinService();

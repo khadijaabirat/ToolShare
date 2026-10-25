@@ -32,5 +32,8 @@ class magasinRepository{
             runValidators:true
         });
     }
+    async getMagasinActive(){
+        return await Magasin.find({isActive:true});
+    }
 }
 module.exports=new magasinRepository();
