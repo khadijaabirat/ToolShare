@@ -7,5 +7,9 @@ class userRepository{
     async findByEmail(email){
         return await User.findOne({email});
     }
+    async deleteUserById(userId){
+        return await User.findByIdAndDelete(userId);
+    }
+    
 }
 module.exports=new userRepository();
