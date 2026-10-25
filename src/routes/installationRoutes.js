@@ -1,6 +1,7 @@
 const express= require('express');
-const getStatus = require('../controllers/instalationController');
-const router=express.Router();
+const installationController = require('../controllers/instalationController');
+ const router=express.Router();
 
-router.get('/status',getStatus);
+router.get('/status',installationController.getStatus);
+router.post('/',installationController.install);
 module.exports=router;
