@@ -1,11 +1,11 @@
 const bcrypt=require('bcryptjs');
 const instalationRepository=require('../repositories/installationRepository');
 const userRepository = require('../repositories/userRepository');
- 
+
 
 class installationServices{
     async checkInstallationStatus(){
-        
+
         const instalation= await instalationRepository.getInstallationStatus();
         if(instalation){
         return instalation.isInstalled;
@@ -19,7 +19,7 @@ const instalation = await this.checkInstallationStatus();
 if(instalation){
     const err=new Error('l application déja installer');
     err.statusCode=400;
-    throw err;   
+    throw err;
 }
 const user = await userRepository.findByEmail(adminData.email);
 if(user){

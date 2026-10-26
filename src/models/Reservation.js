@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-  
+
 const ReservationSchema=new mongoose.Schema({
     userId:{
         type:mongoose.Schema.Types.ObjectId,
@@ -28,7 +28,7 @@ const ReservationSchema=new mongoose.Schema({
     dateFin:{
         type:Date,
         required:true,
- 
+
     },
     dateReelleSortie:{
         type:Date

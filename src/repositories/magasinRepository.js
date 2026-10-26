@@ -8,7 +8,7 @@ class magasinRepository{
             adresse:data.adresse,
             site:data.site
         });
-        
+
     }
 
     async findAllMagasins(){

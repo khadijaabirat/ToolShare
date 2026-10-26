@@ -13,8 +13,8 @@ async function create(req,res,next) {
     }catch (error) {
   next(error);
 }
-   
-    
+
+
 }
 async function getAll(req,res,next) {
        try{const magasins= await magasinService.getAllMagasins();
@@ -26,8 +26,8 @@ async function getAll(req,res,next) {
     }catch (error) {
   next(error);
 }
-    
-    
+
+
 }
 async function  getById(req,res,next) {
        try{  const magasin = await magasinService.getmagasinById(req.params.id);
@@ -39,8 +39,8 @@ async function  getById(req,res,next) {
     }catch (error) {
   next(error);
 }
-  
-    
+
+
 }
 
 async function update(req,res,next) {
@@ -54,8 +54,8 @@ async function update(req,res,next) {
     }catch (error) {
   next(error);
 }
-   
-    
+
+
 }
 
 async function desactive(req,res,next) {
@@ -69,7 +69,7 @@ async function desactive(req,res,next) {
     }catch (error) {
   next(error);
 }
-   
+
 }
 
 
@@ -86,7 +86,7 @@ async function assignMagasin(req,res,next) {
     catch(error){
 next(error);
     }
-    
+
 }
 
 async function getActive(req,res,next) {

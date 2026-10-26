@@ -1,5 +1,5 @@
 const mongoose=require('mongoose');
- 
+
 const MagasinSchema= new mongoose.Schema({
     nom :{
         type:String,

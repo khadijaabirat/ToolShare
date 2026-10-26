@@ -1,5 +1,5 @@
  const instalationService = require("../services/instalationService");
- 
+
 async function getStatus(req,res,next){
     try{
         const status= await instalationService.checkInstallationStatus();
