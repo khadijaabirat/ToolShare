@@ -4,7 +4,7 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const jwt = require('jsonwebtoken');
 const app = require('../../src/app');
-const UserRepository = require('../../src/repositories/UserRepository');
+const UserRepository = require('../../src/repositories/userRepository');
 
 let server;
 let baseUrl;
@@ -55,9 +55,12 @@ async function postJson(body) {
 
 function activeUser() {
   return {
-    _id: 'user-123',
+    _id: '507f1f77bcf86cd799439011',
+    nom: 'Operator',
+    prenom: 'Test',
     email: 'operator@example.com',
-    role: 'WAREHOUSE_OPERATOR',
+    role: 'Utilisateur',
+    magasinId: null,
     isActive: true,
     password: 'never-serialize-this-hash',
     async comparePassword(password) {
@@ -69,6 +72,7 @@ function activeUser() {
 test('POST /api/auth/login returns a short-lived token and safe user data', async (t) => {
   const secret = 'unit-test-secret-with-at-least-thirty-two-bytes';
   setEnvironment(t, 'JWT_SECRET', secret);
+  setEnvironment(t, 'JWT_EXPIRES_IN', undefined);
   let lookedUpEmail;
   mockLoginLookup(t, async (email) => {
     lookedUpEmail = email;
@@ -85,16 +89,19 @@ test('POST /api/auth/login returns a short-lived token and safe user data', asyn
   assert.equal(lookedUpEmail, 'operator@example.com');
   assert.deepEqual(Object.keys(body).sort(), ['token', 'user']);
   assert.deepEqual(body.user, {
-    id: 'user-123',
+    id: '507f1f77bcf86cd799439011',
+    nom: 'Operator',
+    prenom: 'Test',
     email: 'operator@example.com',
-    role: 'WAREHOUSE_OPERATOR',
+    role: 'Utilisateur',
+    magasinId: null,
   });
   assert.equal(JSON.stringify(body).includes('never-serialize-this-hash'), false);
   assert.equal(Object.hasOwn(body.user, 'password'), false);
 
   const claims = jwt.verify(body.token, secret, { algorithms: ['HS256'] });
   assert.deepEqual(Object.keys(claims).sort(), ['exp', 'iat', 'sub']);
-  assert.equal(claims.sub, 'user-123');
+  assert.equal(claims.sub, '507f1f77bcf86cd799439011');
   assert.equal(claims.exp - claims.iat, 15 * 60);
   assert.equal(jwt.decode(body.token, { complete: true }).header.alg, 'HS256');
   assert.throws(
@@ -118,9 +125,7 @@ test('invalid credentials use the same response for unknown email and wrong pass
   assert.equal(unknownResponse.status, 401);
   assert.equal(wrongPasswordResponse.status, 401);
   assert.deepEqual(unknownBody, wrongPasswordBody);
-  assert.deepEqual(unknownBody, {
-    error: { code: 'INVALID_CREDENTIALS', message: 'Invalid email or password.' },
-  });
+  assert.deepEqual(unknownBody, { message: 'Invalid email or password.' });
 });
 
 test('inactive accounts are rejected without a token', async (t) => {
@@ -131,7 +136,7 @@ test('inactive accounts are rejected without a token', async (t) => {
   const body = await response.json();
 
   assert.equal(response.status, 401);
-  assert.equal(body.error.code, 'INVALID_CREDENTIALS');
+  assert.deepEqual(body, { message: 'Invalid email or password.' });
   assert.equal(Object.hasOwn(body, 'token'), false);
 });
 
@@ -143,11 +148,11 @@ test('malformed credentials and malformed JSON receive JSON client errors', asyn
 
   const invalidBody = await postJson({ email: 'not-an-email', password: 'password' });
   assert.equal(invalidBody.status, 400);
-  assert.equal((await invalidBody.json()).error.code, 'INVALID_REQUEST');
+  assert.deepEqual(await invalidBody.json(), { message: 'A valid email and password are required.' });
 
   const missingPassword = await postJson({ email: 'operator@example.com' });
   assert.equal(missingPassword.status, 400);
-  assert.equal((await missingPassword.json()).error.code, 'INVALID_REQUEST');
+  assert.deepEqual(await missingPassword.json(), { message: 'A valid email and password are required.' });
 
   const invalidJson = await fetch(`${baseUrl}/api/auth/login`, {
     method: 'POST',
@@ -155,7 +160,7 @@ test('malformed credentials and malformed JSON receive JSON client errors', asyn
     body: '{',
   });
   assert.equal(invalidJson.status, 400);
-  assert.equal((await invalidJson.json()).error.code, 'INVALID_JSON');
+  assert.deepEqual(await invalidJson.json(), { message: 'Corps JSON invalide.' });
 });
 
 test('missing or known-placeholder JWT configuration fails without looking up a user', async (t) => {
@@ -177,9 +182,7 @@ test('missing or known-placeholder JWT configuration fails without looking up a 
     const body = await response.json();
 
     assert.equal(response.status, 503);
-    assert.deepEqual(body, {
-      error: { code: 'AUTH_UNAVAILABLE', message: 'Authentication is temporarily unavailable.' },
-    });
+    assert.deepEqual(body, { message: 'Authentication is temporarily unavailable.' });
   }
 
   assert.equal(lookupCalled, false);

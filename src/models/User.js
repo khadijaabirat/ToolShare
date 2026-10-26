@@ -1,16 +1,26 @@
 'use strict';
 
 const mongoose = require('mongoose');
-const { hashPassword, verifyPassword } = require('../utils/password');
+const { verifyPassword } = require('../utils/password');
 const { EMAIL_PATTERN } = require('../utils/email');
 
-const userSchema = new mongoose.Schema({
-  email: {
+const UserSchema = new mongoose.Schema({
+  nom: {
     type: String,
     required: true,
     trim: true,
-    lowercase: true,
+  },
+  prenom: {
+    type: String,
+    required: true,
+    trim: true,
+  },
+  email: {
+    type: String,
+    required: true,
     unique: true,
+    lowercase: true,
+    trim: true,
     match: EMAIL_PATTERN,
   },
   password: {
@@ -20,36 +30,38 @@ const userSchema = new mongoose.Schema({
   },
   role: {
     type: String,
+    enum: ['Admin', 'Gestionnaire', 'Utilisateur'],
+    default: 'Utilisateur',
     required: true,
-    trim: true,
+  },
+  magasinId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Magasin',
+    required: function magasinRequired() {
+      return this.role === 'Gestionnaire';
+    },
   },
   isActive: {
     type: Boolean,
-    required: true,
     default: true,
   },
+  createdBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+  },
+}, {
+  timestamps: true,
 });
 
-userSchema.pre('save', async function hashModifiedPassword() {
-  if (this.isModified('password')) {
-    this.password = await hashPassword(this.password);
-  }
-});
-
-userSchema.methods.comparePassword = function comparePassword(candidate) {
-  if (typeof this.password !== 'string') {
-    return Promise.resolve(false);
-  }
-
+UserSchema.methods.comparePassword = function comparePassword(candidate) {
+  if (typeof this.password !== 'string') return Promise.resolve(false);
   return verifyPassword(candidate, this.password);
 };
 
-function removePassword(_document, serialized) {
-  delete serialized.password;
-  return serialized;
-}
+UserSchema.methods.toJSON = function toJSON() {
+  const user = this.toObject();
+  delete user.password;
+  return user;
+};
 
-userSchema.set('toJSON', { transform: removePassword });
-userSchema.set('toObject', { transform: removePassword });
-
-module.exports = mongoose.models.User || mongoose.model('User', userSchema);
+module.exports = mongoose.models.User || mongoose.model('User', UserSchema);

@@ -2,12 +2,12 @@
 
 const { randomBytes } = require('node:crypto');
 const jwt = require('jsonwebtoken');
-const UserRepository = require('../repositories/UserRepository');
+const UserRepository = require('../repositories/userRepository');
 const { isValidEmail, normalizeEmail } = require('../utils/email');
 const { hashPassword, verifyPassword } = require('../utils/password');
 const { getJwtSecret } = require('../utils/jwtConfig');
 
-const TOKEN_LIFETIME = '15m';
+const DEFAULT_TOKEN_LIFETIME = '15m';
 const TOKEN_ALGORITHM = 'HS256';
 const DUMMY_HASH_PROMISE = hashPassword(randomBytes(32).toString('hex'));
 
@@ -53,15 +53,21 @@ async function login(credentials) {
   const token = jwt.sign(
     { sub: userId },
     secret,
-    { algorithm: TOKEN_ALGORITHM, expiresIn: TOKEN_LIFETIME }
+    {
+      algorithm: TOKEN_ALGORITHM,
+      expiresIn: process.env.JWT_EXPIRES_IN || DEFAULT_TOKEN_LIFETIME,
+    }
   );
 
   return {
     token,
     user: {
       id: userId,
+      nom: user.nom,
+      prenom: user.prenom,
       email: user.email,
       role: user.role,
+      magasinId: user.magasinId ? String(user.magasinId) : null,
     },
   };
 }

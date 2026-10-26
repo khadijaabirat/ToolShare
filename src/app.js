@@ -2,28 +2,26 @@
 
 const express = require('express');
 const mongoose = require('mongoose');
-const authRoutes = require('./routes/authRoutes');
-const userRoutes = require('./routes/userRoutes');
+const apiRoutes = require('./routes');
+const errorHandler = require('./middlewares/errorHandler');
 
 const app = express();
 
 app.use(express.json({ limit: '10kb' }));
 
 app.get('/health', (req, res) => {
-  res.json({ status: 'ok', database: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected' });
+  res.json({
+    status: 'ok',
+    database: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',
+  });
 });
 
-app.use('/api/auth', authRoutes);
-app.use('/api/users', userRoutes);
+app.use('/api', apiRoutes);
 
-app.use((error, req, res, next) => {
-  if (error && error.type === 'entity.parse.failed') {
-    return res.status(400).json({
-      error: { code: 'INVALID_JSON', message: 'Request body must be valid JSON.' },
-    });
-  }
-
-  return next(error);
+app.use((req, res) => {
+  res.status(404).json({ message: 'Route non trouvée' });
 });
+
+app.use(errorHandler);
 
 module.exports = app;

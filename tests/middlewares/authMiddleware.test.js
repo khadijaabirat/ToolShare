@@ -3,8 +3,8 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const jwt = require('jsonwebtoken');
-const authenticate = require('../../src/middleware/authenticate');
-const UserRepository = require('../../src/repositories/UserRepository');
+const authenticate = require('../../src/middlewares/authMiddleware');
+const UserRepository = require('../../src/repositories/userRepository');
 
 const SECRET = 'middleware-test-secret-with-at-least-thirty-two-bytes';
 const USER_ID = '507f1f77bcf86cd799439011';
@@ -21,10 +21,10 @@ function setEnvironment(t, name, value) {
 }
 
 function mockFindById(t, implementation) {
-  const original = UserRepository.findById;
-  UserRepository.findById = implementation;
+  const original = UserRepository.findUserById;
+  UserRepository.findUserById = implementation;
   t.after(() => {
-    UserRepository.findById = original;
+    UserRepository.findUserById = original;
   });
 }
 
@@ -56,6 +56,7 @@ async function invoke(token) {
   const next = (error) => {
     nextCalled = true;
     nextError = error;
+    if (error) res.status(error.statusCode).json({ message: error.message });
   };
 
   await authenticate(req, res, next);
@@ -65,9 +66,12 @@ async function invoke(token) {
 function activeUser() {
   return {
     _id: USER_ID,
+    nom: 'Operator',
+    prenom: 'Test',
     email: 'operator@example.com',
-    role: 'WAREHOUSE_OPERATOR',
+    role: 'Utilisateur',
     isActive: true,
+    magasinId: null,
     password: 'never-return-this-hash',
   };
 }
@@ -84,8 +88,11 @@ test('accepts a valid HS256 token and attaches only safe fields for an active us
   assert.equal(result.nextError, undefined);
   assert.deepEqual(result.req.user, {
     id: USER_ID,
+    nom: 'Operator',
+    prenom: 'Test',
     email: 'operator@example.com',
-    role: 'WAREHOUSE_OPERATOR',
+    role: 'Utilisateur',
+    magasinId: null,
   });
   assert.equal(Object.hasOwn(result.req.user, 'password'), false);
   assert.equal(JSON.stringify(result.req.user).includes('never-return-this-hash'), false);
@@ -97,7 +104,7 @@ test('rejects a missing Authorization header', async (t) => {
 
   const { res, req } = await invoke();
   assert.equal(res.statusCode, 401);
-  assert.equal(res.body.error.code, 'UNAUTHENTICATED');
+  assert.deepEqual(res.body, { message: 'Authentification requise.' });
   assert.equal(req.user, undefined);
 });
 
@@ -108,7 +115,10 @@ test('rejects malformed Bearer headers', async (t) => {
   for (const header of ['Basic abc', 'Bearer', 'Bearer a b', 'Bearer  abc']) {
     const req = { headers: { authorization: header } };
     const res = makeResponse();
-    await authenticate(req, res, () => assert.fail('next must not run'));
+    await authenticate(req, res, (error) => {
+      assert.ok(error, header);
+      res.status(error.statusCode).json({ message: error.message });
+    });
     assert.equal(res.statusCode, 401, header);
   }
 });
@@ -182,7 +192,7 @@ test('fails safely when JWT_SECRET is missing or invalid', async (t) => {
     const result = await invoke(`Bearer ${makeToken()}`);
     assert.equal(result.res.statusCode, 503);
     assert.deepEqual(result.res.body, {
-      error: { code: 'AUTH_UNAVAILABLE', message: 'Authentication is temporarily unavailable.' },
+      message: 'Le service d’authentification est temporairement indisponible.',
     });
     assert.equal(JSON.stringify(result.res.body).includes(SECRET), false);
   }

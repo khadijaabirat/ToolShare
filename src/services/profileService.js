@@ -1,6 +1,6 @@
 'use strict';
 
-const UserRepository = require('../repositories/UserRepository');
+const UserRepository = require('../repositories/userRepository');
 const { isValidEmail, normalizeEmail } = require('../utils/email');
 
 const ALLOWED_UPDATE_FIELDS = new Set(['email', 'currentPassword', 'newPassword']);
@@ -25,8 +25,11 @@ function unauthenticated() {
 function safeUser(user) {
   return {
     id: String(user._id ?? user.id),
+    nom: user.nom,
+    prenom: user.prenom,
     email: user.email,
     role: user.role,
+    magasinId: user.magasinId ? String(user.magasinId) : null,
   };
 }
 

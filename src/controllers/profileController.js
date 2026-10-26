@@ -5,12 +5,12 @@ const ProfileService = require('../services/profileService');
 function sendError(res, error) {
   if (error instanceof ProfileService.ProfileError) {
     return res.status(error.statusCode).json({
-      error: { code: error.code, message: error.message },
+      message: error.message,
     });
   }
 
   return res.status(500).json({
-    error: { code: 'INTERNAL_ERROR', message: 'An unexpected error occurred.' },
+    message: 'Erreur serveur',
   });
 }
 

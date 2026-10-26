@@ -1,37 +1,35 @@
 'use strict';
 
 const jwt = require('jsonwebtoken');
-const UserRepository = require('../repositories/UserRepository');
+const userRepository = require('../repositories/userRepository');
 const { getJwtSecret } = require('../utils/jwtConfig');
 
 const OBJECT_ID_PATTERN = /^[a-f\d]{24}$/i;
 
-function unauthorized(res) {
-  return res.status(401).json({
-    error: { code: 'UNAUTHENTICATED', message: 'Authentication is required.' },
-  });
+function authError(statusCode, message) {
+  const error = new Error(message);
+  error.statusCode = statusCode;
+  return error;
 }
 
 function authenticate(req, res, next) {
-  const authorization = req.get ? req.get('authorization') : req.headers?.authorization;
+  const authorization = req.headers && req.headers.authorization;
   const match = typeof authorization === 'string'
     ? /^Bearer ([^\s]+)$/i.exec(authorization)
     : null;
 
-  if (!match) return unauthorized(res);
+  if (!match) return next(authError(401, 'Authentification requise.'));
 
   const secret = getJwtSecret();
   if (!secret) {
-    return res.status(503).json({
-      error: { code: 'AUTH_UNAVAILABLE', message: 'Authentication is temporarily unavailable.' },
-    });
+    return next(authError(503, 'Le service d’authentification est temporairement indisponible.'));
   }
 
   let claims;
   try {
     claims = jwt.verify(match[1], secret, { algorithms: ['HS256'] });
   } catch (_error) {
-    return unauthorized(res);
+    return next(authError(401, 'Authentification requise.'));
   }
 
   const now = Math.floor(Date.now() / 1000);
@@ -47,17 +45,22 @@ function authenticate(req, res, next) {
     claims.exp <= claims.iat ||
     claims.exp <= now
   ) {
-    return unauthorized(res);
+    return next(authError(401, 'Authentification requise.'));
   }
 
-  return UserRepository.findById(claims.sub)
+  return userRepository.findUserById(claims.sub)
     .then((user) => {
-      if (!user || user.isActive !== true) return unauthorized(res);
+      if (!user || user.isActive !== true) {
+        return next(authError(401, 'Authentification requise.'));
+      }
 
       req.user = {
         id: String(user._id),
+        nom: user.nom,
+        prenom: user.prenom,
         email: user.email,
         role: user.role,
+        magasinId: user.magasinId ? String(user.magasinId) : null,
       };
       return next();
     })

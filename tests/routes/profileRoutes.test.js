@@ -4,7 +4,7 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const jwt = require('jsonwebtoken');
 const app = require('../../src/app');
-const UserRepository = require('../../src/repositories/UserRepository');
+const UserRepository = require('../../src/repositories/userRepository');
 
 const SECRET = 'profile-route-test-secret-at-least-thirty-two-bytes';
 const USER_ID = '507f1f77bcf86cd799439011';
@@ -53,16 +53,19 @@ function makeToken() {
 function activeUser(overrides = {}) {
   return {
     _id: USER_ID,
+    nom: 'Operator',
+    prenom: 'Test',
     email: 'operator@example.com',
-    role: 'WAREHOUSE_OPERATOR',
+    role: 'Utilisateur',
     isActive: true,
+    magasinId: null,
     password: 'never-return-this-hash',
     ...overrides,
   };
 }
 
 function mockAuthenticatedLookup(t, implementation = async () => activeUser()) {
-  replaceRepositoryMethod(t, 'findById', implementation);
+  replaceRepositoryMethod(t, 'findUserById', implementation);
 }
 
 const PROFILE_PATHS = ['/api/users/me', '/api/auth/profile'];
@@ -89,23 +92,28 @@ test('GET profile endpoints return the authenticated safe profile only', async (
 
     assert.equal(response.status, 200, path);
     assert.deepEqual(body, {
-      user: { id: USER_ID, email: 'operator@example.com', role: 'WAREHOUSE_OPERATOR' },
+      user: {
+        id: USER_ID,
+        nom: 'Operator',
+        prenom: 'Test',
+        email: 'operator@example.com',
+        role: 'Utilisateur',
+        magasinId: null,
+      },
     }, path);
     assert.equal(JSON.stringify(body).includes('never-return-this-hash'), false, path);
   }
 });
 
 test('GET and PUT profile reject unauthenticated requests', async (t) => {
-  replaceRepositoryMethod(t, 'findById', () => assert.fail('lookup must not run'));
+  replaceRepositoryMethod(t, 'findUserById', () => assert.fail('lookup must not run'));
 
   for (const path of PROFILE_PATHS) {
     for (const [method, body] of [['GET'], ['PUT', { email: 'new@example.com' }]]) {
       const response = await send(method, body, null, path);
       const result = await response.json();
       assert.equal(response.status, 401, `${path} ${method}`);
-      assert.deepEqual(result, {
-        error: { code: 'UNAUTHENTICATED', message: 'Authentication is required.' },
-      }, `${path} ${method}`);
+      assert.deepEqual(result, { message: 'Authentification requise.' }, `${path} ${method}`);
     }
   }
 });
@@ -120,7 +128,7 @@ test('deleted and inactive users cannot access profile routes', async (t) => {
       user = currentUser;
       const response = await send('GET', undefined, makeToken(), path);
       assert.equal(response.status, 401, path);
-      assert.equal((await response.json()).error.code, 'UNAUTHENTICATED', path);
+      assert.deepEqual(await response.json(), { message: 'Authentification requise.' }, path);
     }
   }
 });
@@ -142,7 +150,14 @@ test('PUT profile normalizes and updates email', async (t) => {
     assert.equal(response.status, 200, path);
     assert.deepEqual(captured, { id: USER_ID, updates: { email: 'new.user@example.com' } }, path);
     assert.deepEqual(body, {
-      user: { id: USER_ID, email: 'new.user@example.com', role: 'WAREHOUSE_OPERATOR' },
+      user: {
+        id: USER_ID,
+        nom: 'Operator',
+        prenom: 'Test',
+        email: 'new.user@example.com',
+        role: 'Utilisateur',
+        magasinId: null,
+      },
     }, path);
     assert.equal(JSON.stringify(body).includes('must-not-return'), false, path);
   }
@@ -176,7 +191,10 @@ test('PUT rejects invalid bodies, email values, and protected or unknown fields'
     for (const input of invalidBodies) {
       const response = await send('PUT', input.body, makeToken(), path);
       assert.equal(response.status, 400, `${path} ${JSON.stringify(input.body)}`);
-      assert.equal((await response.json()).error.code, input.code, `${path} ${JSON.stringify(input.body)}`);
+      const body = await response.json();
+      assert.equal(body.message, input.code === 'INVALID_JSON'
+        ? 'Corps JSON invalide.'
+        : 'A valid profile update is required.', `${path} ${JSON.stringify(input.body)}`);
     }
   }
 });
@@ -192,9 +210,7 @@ test('PUT reports duplicate email without returning repository details', async (
     const response = await send('PUT', { email: 'taken@example.com' }, makeToken(), path);
     const body = await response.json();
     assert.equal(response.status, 409, path);
-    assert.deepEqual(body, {
-      error: { code: 'EMAIL_ALREADY_IN_USE', message: 'Email is already in use.' },
-    }, path);
+    assert.deepEqual(body, { message: 'Email is already in use.' }, path);
     assert.equal(JSON.stringify(body).includes('private persistence detail'), false, path);
   }
 });
@@ -228,7 +244,14 @@ test('PUT changes a password only after verifying the current password', async (
     assert.equal(comparedPassword, 'current-password', path);
     assert.deepEqual(storedPassword, { id: USER_ID, newPassword: 'new-password' }, path);
     assert.deepEqual(body, {
-      user: { id: USER_ID, email: 'operator@example.com', role: 'WAREHOUSE_OPERATOR' },
+      user: {
+        id: USER_ID,
+        nom: 'Operator',
+        prenom: 'Test',
+        email: 'operator@example.com',
+        role: 'Utilisateur',
+        magasinId: null,
+      },
     }, path);
     assert.equal(JSON.stringify(body).includes('scrypt'), false, path);
     assert.equal(JSON.stringify(body).includes('current-password'), false, path);
@@ -253,9 +276,7 @@ test('PUT rejects an incorrect current password without updating the password', 
       newPassword: 'new-password',
     }, makeToken(), path);
     assert.equal(response.status, 401, path);
-    assert.deepEqual(await response.json(), {
-      error: { code: 'INVALID_CURRENT_PASSWORD', message: 'Current password is incorrect.' },
-    }, path);
+    assert.deepEqual(await response.json(), { message: 'Current password is incorrect.' }, path);
   }
 });
 
@@ -271,6 +292,6 @@ test('PUT reports a deleted or inactive account during password change as unauth
       newPassword: 'new-password',
     }, makeToken(), path);
     assert.equal(response.status, 401, path);
-    assert.equal((await response.json()).error.code, 'UNAUTHENTICATED', path);
+    assert.deepEqual(await response.json(), { message: 'Authentication is required.' }, path);
   }
 });

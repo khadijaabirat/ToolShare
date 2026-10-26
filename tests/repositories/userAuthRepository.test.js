@@ -3,7 +3,8 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const User = require('../../src/models/User');
-const UserRepository = require('../../src/repositories/UserRepository');
+const UserRepository = require('../../src/repositories/userRepository');
+const { verifyPassword } = require('../../src/utils/password');
 
 function replaceMethod(t, target, method, replacement) {
   const original = target[method];
@@ -120,26 +121,18 @@ test('does not issue an update when the profile contains no permitted fields', a
 });
 
 test('keeps password changes separate and returns a password-excluded user', async (t) => {
-  let lookupCount = 0;
-  let saved = false;
-  const user = {
-    _id: 'user-id',
-    password: undefined,
-    async save() {
-      saved = true;
-      this.password = 'stored-hash';
-    },
-  };
-
-  replaceMethod(t, User, 'findById', () => {
-    lookupCount += 1;
-    if (lookupCount === 1) return Promise.resolve(user);
-    return { select: (selection) => Promise.resolve({ selection, id: 'user-id' }) };
+  let captured;
+  replaceMethod(t, User, 'findByIdAndUpdate', (id, update, options) => {
+    captured = { id, update, options };
+    return { select: (selection) => Promise.resolve({ selection, id }) };
   });
 
   const result = await UserRepository.updatePassword('user-id', 'new-password');
 
-  assert.equal(saved, true);
-  assert.equal(user.password, 'stored-hash');
+  assert.equal(captured.id, 'user-id');
+  assert.deepEqual(captured.options, { new: true, runValidators: true });
+  assert.equal(Object.hasOwn(captured.update.$set, 'password'), true);
+  assert.equal(await verifyPassword('new-password', captured.update.$set.password), true);
+  assert.notEqual(captured.update.$set.password, 'new-password');
   assert.deepEqual(result, { selection: '-password', id: 'user-id' });
 });
