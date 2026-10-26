@@ -9,6 +9,8 @@ const errorHandler = (err, req, res, next) => {
     statusCode = 400;
   }
 
+  if (statusCode >= 500) message = 'Erreur serveur';
+
   res.status(statusCode).json({
     message
   });
