@@ -124,3 +124,47 @@ test('concurrent Admin deactivations cannot both pass the active-Admin count', a
     assert.equal(updateCalls, 1);
     assert.equal(activeLockOwner, null);
 });
+
+
+test("deactivation updates isActive without deleting the user", async (t) => {
+  const USER_ID = "507f1f77bcf86cd799439013";
+  let updateCall = null;
+  let deleteCalls = 0;
+
+  const originalFindById = User.findById;
+  const originalFindOneAndUpdate = User.findOneAndUpdate;
+  const originalFindByIdAndDelete = User.findByIdAndDelete;
+
+  User.findById = () =>
+    queryFor({
+      role: "Utilisateur",
+      isActive: true,
+    });
+
+  User.findOneAndUpdate = async (...args) => {
+    updateCall = args;
+    return { _id: USER_ID, role: "Utilisateur", isActive: false };
+  };
+
+  User.findByIdAndDelete = async () => {
+    deleteCalls += 1;
+    return null;
+  };
+
+  t.after(() => {
+    User.findById = originalFindById;
+    User.findOneAndUpdate = originalFindOneAndUpdate;
+    User.findByIdAndDelete = originalFindByIdAndDelete;
+  });
+
+  const result = await userRepository.deactivateUser(USER_ID);
+
+  assert.equal(result.isActive, false);
+  assert.ok(updateCall, "User.findOneAndUpdate should be called");
+  assert.equal(updateCall[0]._id, USER_ID);
+  assert.equal(updateCall[0].isActive, true);
+  assert.deepEqual(updateCall[1], {
+    $set: { isActive: false },
+  });
+  assert.equal(deleteCalls, 0);
+});
