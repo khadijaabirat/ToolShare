@@ -19,6 +19,10 @@ class magasinRepository{
         return await Magasin.findById(id);
     }
 
+    async findActiveMagasinById(id){
+        return await Magasin.findOne({ _id: id, isActive: true });
+    }
+
     async updateMagasin(id,data){
         return await Magasin.findByIdAndUpdate(id,data,{
             new:true,

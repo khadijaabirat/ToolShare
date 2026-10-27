@@ -16,7 +16,9 @@
  */
 
 const bcrypt = require('bcryptjs');
+const mongoose = require('mongoose');
 const userRepository = require('../repositories/userRepository');
+const magasinRepository = require('../repositories/magasinRepository');
 const { isValidEmail, normalizeEmail } = require('../utils/email');
 
 const VALID_ROLES = new Set(['Admin', 'Gestionnaire', 'Utilisateur']);
@@ -83,6 +85,40 @@ class UserService {
             throw err;
         }
 
+        // A manager's store is sourced from the authenticated database user,
+        // never from request data. Managers without an active assignment fail closed.
+        const isManager = callerUser.role === 'Gestionnaire';
+        const assignedMagasinId = isManager ? callerUser.magasinId : magasinId;
+
+        if (role === 'Gestionnaire' && !assignedMagasinId) {
+            const err = new Error('Un compte Gestionnaire doit être associé à un magasin (magasinId requis).');
+            err.statusCode = 400;
+            throw err;
+        }
+
+        if (isManager && (typeof assignedMagasinId !== 'string' || !mongoose.isValidObjectId(assignedMagasinId))) {
+            const err = new Error('Votre compte Gestionnaire n\'a pas d\'affectation magasin valide.');
+            err.statusCode = 403;
+            throw err;
+        }
+
+        if (assignedMagasinId && (typeof assignedMagasinId !== 'string' || !mongoose.isValidObjectId(assignedMagasinId))) {
+            const err = new Error('magasinId invalide.');
+            err.statusCode = 400;
+            throw err;
+        }
+
+        if (assignedMagasinId) {
+            const magasin = await magasinRepository.findActiveMagasinById(assignedMagasinId);
+            if (!magasin) {
+                const err = new Error(isManager
+                    ? 'Votre magasin est introuvable ou désactivé.'
+                    : 'Le magasin fourni est introuvable ou désactivé.');
+                err.statusCode = isManager ? 403 : 400;
+                throw err;
+            }
+        }
+
         // Unique-email guard — returns a clean 409 instead of a Mongoose duplicate-key crash.
         const normalizedEmail = normalizeEmail(email);
         const existing = await userRepository.findByEmail(normalizedEmail);
@@ -102,8 +138,9 @@ class UserService {
             role,
             createdBy: callerUser.id,
             isActive: true,
-            // magasinId only when explicitly provided (avoids storing undefined).
-            ...(magasinId ? { magasinId } : {}),
+            // Managers are scoped to their trusted assignment; Admins may
+            // choose another valid active magasin.
+            ...(assignedMagasinId ? { magasinId: assignedMagasinId } : {}),
         };
 
         return userRepository.createUser(userData);
