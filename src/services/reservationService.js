@@ -41,5 +41,11 @@ async createReservation({userId,magasinId,materielId,dateDebut,dureeHeures}){
         return await reservationRepository.createReservation({userId,magasinId,materielId, ...dates});
     }
 }
+
+async getMyReservation(userId){
+return await reservationRepository.getMyReservations(userId);
+}
+
+
 }
 module.exports=new reservationService();
