@@ -5,4 +5,4 @@ const authMiddleware=require('../middlewares/authMiddleware');
 
 router.post('/',authMiddleware,reservationController.Create);
 
-module.exports= router;
+module.exports= router; 
