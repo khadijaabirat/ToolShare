@@ -16,5 +16,11 @@ class reservationRepository{
     }
 
 
+    async getMyReservations(userId){
+        return await Reservation.find({userId:userId})
+        .populate('materielId','nom description')
+        .populate('magasinId','nom adresse site')
+    }
+
 }
 module.exports=new reservationRepository();
