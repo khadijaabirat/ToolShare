@@ -33,5 +33,13 @@ if(reservation){
 }
 return true;
 }
+
+
+async createReservation({userId,magasinId,materielId,dateDebut,dureeHeures}){
+    const dates = await this.calculeDatesReservation(dateDebut,dureeHeures);
+    if(await this.checkAvailability(materielId,dates.dateDebut,dates.dateFin)){
+        return await reservationRepository.createReservation({userId,magasinId,materielId, ...dates});
+    }
+}
 }
 module.exports=new reservationService();
