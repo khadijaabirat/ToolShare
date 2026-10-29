@@ -5,4 +5,5 @@ const authMiddleware=require('../middlewares/authMiddleware');
 
 router.post('/',authMiddleware,reservationController.Create);
 router.get('/my',authMiddleware,reservationController.getMyReservations);
+router.delete('/:id',authMiddleware,reservationController.annulerReservation);
 module.exports= router; 
