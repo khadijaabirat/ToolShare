@@ -73,6 +73,26 @@ res.status(200).json({
     }
     
 }
+
+
+async function enregistrerRetour(req, res, next){
+try{
+    const id = req.params.id;
+    const user = req.user;
+    const etatRetour= req.body.etatRetour;
+   const reservation= await reservationService.enregistrerRetour(id,user,etatRetour);
+   
+   res.status(200).json({
+    success:true,
+    message:'l enregistrement de retour passe bien ',
+    data:reservation
+   });
+    
+
+}catch(error){
+next(error);
+}
+}
 module.exports={
-    Create, getMyReservations,annulerReservation,getReservations
+    Create, getMyReservations,annulerReservation,getReservations,enregistrerRetour
 }

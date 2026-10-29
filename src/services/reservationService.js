@@ -80,5 +80,42 @@ async getreservationsWithFilter(user,filter){
     return await reservationRepository.getReservationWithFilter(filter);
   }
 }
+
+async enregistrerRetour(reservationId,user,etatRetour){
+     if(!etatRetour){
+        const err = new Error('etat obligatoire');
+        err.statusCode=400;
+        throw err;
+    }
+    const reservation= await reservationRepository.getReservation(reservationId);
+    if(!reservation){
+        const err = new Error('la reservation introuvable');
+        err.statusCode=404;
+        throw err;
+    }
+    if(user.role==='Gestionnaire'){
+        if(user.magasinId?.toString()!==reservation.magasinId?.toString()){
+             const err = new Error('impossible de modifier cette reservation ');
+        err.statusCode=403;
+        throw err;
+        }
+    }
+      if (reservation.statut === 'TERMINEE' || reservation.statut === 'ANNULEE'){
+   const err = new Error('impossible de modifier cette reservation ');
+        err.statusCode=403;
+        throw err;
+        }
+        const date= new Date();
+        let status="DISPONIBLE";
+        if(etatRetour =='ENDOMMAGE'){
+            status="INDISPONIBLE"
+        }
+      
+        return await reservationRepository.enregistrerRetour(reservationId, {
+            dateReelleRetour: date,
+            etatRetour,
+            statut: status
+        });
+}
 }
 module.exports=new reservationService();

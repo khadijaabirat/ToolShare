@@ -1,5 +1,5 @@
 const Reservation= require('../models/Reservation');
-
+const Materiel=require('../models/Materiel');
 class reservationRepository{
     async findOverlappingReservation(materielId, ndateDebut, ndateFin) {
         return await Reservation.findOne({
@@ -33,12 +33,32 @@ class reservationRepository{
    async getReservation(id){
 return await Reservation.findById(id);
    }
-
    async getReservationWithFilter(filter){
     const Reservations=await Reservation.find(filter)
     .populate('materielId','nom reference')
     .populate('userId','nom prenom email');
     return Reservations;
    }
+
+
+   async enregistrerRetour(id, { dateReelleRetour, date, etatRetour, statut, status }) {
+    const dateToSave = dateReelleRetour || date || new Date();
+    const statutToSave = statut || status || 'DISPONIBLE';
+    const reservation = await Reservation.findByIdAndUpdate(
+        id,
+        { dateReelleDeReteur: dateToSave, etatRetour, statut: 'TERMINEE' },
+        { new: true, runValidators: true }
+    );
+    if (reservation && reservation.materielId) {
+        await Materiel.findByIdAndUpdate(
+            reservation.materielId,
+            { statut: statutToSave },
+            { new: true, runValidators: true }
+        );
+    }
+    return reservation;
+   }
+
+
 }
 module.exports=new reservationRepository();
