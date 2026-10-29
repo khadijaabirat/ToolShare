@@ -41,6 +41,23 @@ async function getMyReservations(req,res,next){
     }
 
 }
+
+async function annulerReservation(req,res,next){
+    try{
+        const userId=req.user.id;
+        const id=req.params.id;
+    const reservation= await reservationService.annulationReservation(id,userId);
+return res.status(200).json({
+    success:true,
+    message:"la reservation annuler avec sucess",
+    data:reservation
+})
+    }catch(error){
+next(error);
+    }
+
+}
+
 module.exports={
-    Create, getMyReservations
+    Create, getMyReservations,annulerReservation
 }

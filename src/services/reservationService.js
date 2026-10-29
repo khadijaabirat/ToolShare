@@ -47,5 +47,21 @@ return await reservationRepository.getMyReservations(userId);
 }
 
 
+async annulationReservation(id,userId){
+    const reservation = await reservationRepository.getReservation(id);
+
+    if(!reservation ){
+const err = new Error('la reservation et introuvable ou sa date on passé');
+err.statusCode=404;
+throw err;
+    }
+        if( reservation.dateDebut< new Date() || reservation.userId.toString()!==userId.toString() || reservation.statut!="CONFIRMEE"){
+const err = new Error(' la date de reservation dans passé ou la annulation pas possible ');
+err.statusCode=400;
+throw err;
+    }
+    return await reservationRepository.annulerReservation(id);
+}
+
 }
 module.exports=new reservationService();

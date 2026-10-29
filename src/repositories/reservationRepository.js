@@ -22,5 +22,17 @@ class reservationRepository{
         .populate('magasinId','nom adresse site')
     }
 
+    async annulerReservation(id){
+        return await Reservation.findByIdAndUpdate(id , {statut:"ANNULEE"},
+            {
+            new:true,
+            runValidators:true
+        }
+    );
+   }
+   async getReservation(id){
+return await Reservation.findById(id);
+   }
+
 }
 module.exports=new reservationRepository();
