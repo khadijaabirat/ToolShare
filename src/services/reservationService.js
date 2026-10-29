@@ -63,5 +63,22 @@ throw err;
     return await reservationRepository.annulerReservation(id);
 }
 
+
+async getreservationsWithFilter(user,filter){
+   
+    const query={...filter};
+   if(user.role === 'Gestionnaire' ){
+       if(!user.magasinId){
+           const err = new Error('error');
+           err.statusCode =403;
+           throw err;
+        }
+        query.magasinId=user.magasinId;
+    return await reservationRepository.getReservationWithFilter(query);
+  }  
+  if(user.role ==='Admin'){
+    return await reservationRepository.getReservationWithFilter(filter);
+  }
+}
 }
 module.exports=new reservationService();
