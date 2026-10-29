@@ -34,5 +34,11 @@ class reservationRepository{
 return await Reservation.findById(id);
    }
 
+   async getReservationWithFilter(filter){
+    const Reservations=await Reservation.find(filter)
+    .populate('materielId','nom reference')
+    .populate('userId','nom prenom email');
+    return Reservations;
+   }
 }
 module.exports=new reservationRepository();

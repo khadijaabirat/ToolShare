@@ -58,6 +58,21 @@ next(error);
 
 }
 
+
+async function getReservations(req,res,next){
+    try{
+        const user=req.user;
+        const filter= req.query;
+const reservations= await reservationService.getreservationsWithFilter(user,filter);
+res.status(200).json({
+    success:true,
+    data:reservations
+})
+    }catch(error){
+        next(error);
+    }
+    
+}
 module.exports={
-    Create, getMyReservations,annulerReservation
+    Create, getMyReservations,annulerReservation,getReservations
 }
