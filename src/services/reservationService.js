@@ -39,7 +39,7 @@ return true;
 
 async createReservation({userId,magasinId,materielId,dateDebut,dureeHeures}){
     const dates = await this.calculeDatesReservation(dateDebut,dureeHeures);
-    const materiel=await materielRepository.findMaterielById(materielId);
+    const materiel=await materielRepository.findById(materielId);
     if(!materiel){
         const err = new Error('ce matériel introuvable');
         err.statusCode=404;

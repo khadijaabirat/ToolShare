@@ -4,11 +4,12 @@ const express = require('express');
 const mongoose = require('mongoose');
 const apiRoutes = require('./routes');
 const errorHandler = require('./middlewares/errorHandler');
-
+const swaggerUi= require('swagger-ui-express');
+const swaggerDocument=require('./docs/swagger.json'); 
 const app = express();
 
 app.use(express.json({ limit: '10kb' }));
-
+app.use('/api/docs',swaggerUi.serve,swaggerUi.setup(swaggerDocument));
 app.get('/health', (req, res) => {
   res.json({
     status: 'ok',

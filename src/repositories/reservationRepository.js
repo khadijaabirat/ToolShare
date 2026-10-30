@@ -55,7 +55,8 @@ return await Reservation.findById(id);
         { new: true, runValidators: true }
     );
     if (reservation && reservation.materielId) {
-        await materielRepository.UpdateMateriel(reservation.materielId, statutToSave);
+        await materielRepository.updateFields
+        (reservation.materielId, statutToSave);
     }
     return reservation;
    }
