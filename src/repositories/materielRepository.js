@@ -60,6 +60,14 @@ class MaterielRepository {
       { new: true, runValidators: true }
     );
   }
+
+  updateMaterielStatut(id, statut) {
+    return Materiel.findByIdAndUpdate(
+      id,
+      { $set: { statut } },
+      { new: true, runValidators: true }
+    );
+  }
 }
 
 module.exports = new MaterielRepository();
