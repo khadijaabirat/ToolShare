@@ -5,7 +5,7 @@ const materielRepository = require('../repositories/materielRepository');
 const magasinRepository = require('../repositories/magasinRepository');
 const { normalizeReference } = require('../utils/materialReferenceAudit');
 
-const OBJECT_ID_PATTERN = /^[a-f\\d]{24}$/i;
+const OBJECT_ID_PATTERN = /^[a-f\d]{24}$/i;
 const CREATE_FIELDS = new Set(['reference', 'nom', 'categorie', 'description', 'magasinId']);
 const UPDATE_FIELDS = new Set(['reference', 'nom', 'categorie', 'description']);
 const MATERIAL_STATUSES = new Set(['DISPONIBLE', 'INDISPONIBLE']);
