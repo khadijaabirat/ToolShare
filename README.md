@@ -415,6 +415,9 @@ npm test
 ℹ duration_ms 5040.8727
 ```
 
+> [!NOTE]
+> For the complete QA strategy, detailed test matrix, visual Mermaid Gantt chart, and Jira competency framework alignment (Subtask 63), consult the dedicated document: [`docs/PLAN_DE_TESTS_ET_GANTT.md`](file:///c:/Users/ycode/Desktop/ToolShare/docs/PLAN_DE_TESTS_ET_GANTT.md).
+
 ---
 
 ## Git Workflow & Commit Conventions
@@ -454,6 +457,7 @@ Developed as part of the **ToolShare Industrial Equipment Platform Project**:
   - Engineered the conflict-free reservation scheduling engine and contiguous slot algorithms (`TOOL-103`).
   - Implemented the equipment return lifecycle, actual timestamps tracking, and automatic damage inspection (`TOOL-116`, `TOOL-117`).
   - Authored the comprehensive OpenAPI 3.0 (Swagger UI) specification and API interactive documentation (`TOOL-127`).
+  - Finalized the QA Test Plan, project Gantt chart, and Jira competency consistency audit (`docs/PLAN_DE_TESTS_ET_GANTT.md`).
 
 - **Ayman Loussal** (`aymanloussal552@gmail.com`)  
   *DevOps, Security, Concurrency & Quality Assurance*

@@ -1,0 +1,241 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 820" width="1280" height="820" style="background:#0f172a; font-family:'Segoe UI', system-ui, -apple-system, sans-serif;">
+  <defs>
+    <!-- Gradients -->
+    <linearGradient id="headerGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#3b82f6"/>
+      <stop offset="50%" stop-color="#8b5cf6"/>
+      <stop offset="100%" stop-color="#ec4899"/>
+    </linearGradient>
+    
+    <linearGradient id="barKhadija" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#0284c7"/>
+      <stop offset="100%" stop-color="#38bdf8"/>
+    </linearGradient>
+
+    <linearGradient id="barAyman" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#059669"/>
+      <stop offset="100%" stop-color="#34d399"/>
+    </linearGradient>
+
+    <linearGradient id="barCrit" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#e11d48"/>
+      <stop offset="100%" stop-color="#fb7185"/>
+    </linearGradient>
+
+    <filter id="shadow" x="-5%" y="-10%" width="110%" height="130%">
+      <feDropShadow dx="0" dy="4" stdDeviation="4" flood-color="#000000" flood-opacity="0.4"/>
+    </filter>
+  </defs>
+
+  <!-- Card Background -->
+  <rect x="20" y="20" width="1240" height="780" rx="16" fill="#1e293b" stroke="#334155" stroke-width="1.5" filter="url(#shadow)"/>
+
+  <!-- Title & Subtitle -->
+  <text x="50" y="65" font-size="24" font-weight="700" fill="url(#headerGrad)">ToolShare — Diagramme de Gantt &amp; Chronogramme du Projet</text>
+  <text x="50" y="92" font-size="13" fill="#94a3b8">Planning d'exécution Scrum (19/10/2026 – 30/10/2026) | Traçabilité Jira &amp; Chemin Critique (Khadija Abirat &amp; Ayman Loussal)</text>
+
+  <!-- Legend -->
+  <g transform="translate(680, 50)">
+    <rect x="0" y="0" width="16" height="16" rx="4" fill="url(#barKhadija)"/>
+    <text x="24" y="13" font-size="12" fill="#cbd5e1">Khadija (Architecture &amp; Core)</text>
+
+    <rect x="200" y="0" width="16" height="16" rx="4" fill="url(#barAyman)"/>
+    <text x="224" y="13" font-size="12" fill="#cbd5e1">Ayman (Docker &amp; Concurrence)</text>
+
+    <rect x="0" y="25" width="16" height="16" rx="4" fill="url(#barCrit)"/>
+    <text x="24" y="38" font-size="12" fill="#fda4af">Chemin Critique (Critical)</text>
+
+    <polygon points="208,25 216,33 208,41 200,33" fill="#fbbf24"/>
+    <text x="224" y="38" font-size="12" fill="#fde68a">Jalon Clé (Milestone)</text>
+  </g>
+
+  <!-- Timeline Grid Header -->
+  <!-- Days: 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30 Oct -->
+  <!-- Timeline starts at X=440 to X=1200 (width = 760px, ~63.3px per day for 12 days) -->
+  <g transform="translate(0, 115)">
+    <!-- Header row bg -->
+    <rect x="50" y="0" width="1180" height="35" rx="6" fill="#0f172a" stroke="#334155" stroke-width="1"/>
+    <text x="65" y="22" font-size="13" font-weight="600" fill="#cbd5e1">Tâches &amp; Tickets Jira</text>
+    <text x="360" y="22" font-size="12" font-weight="600" fill="#94a3b8">Resp.</text>
+
+    <!-- Days labels -->
+    <!-- Day 0: 19/10 at 450 -->
+    <text x="455" y="22" font-size="11" font-weight="600" fill="#60a5fa">19/10</text>
+    <text x="518" y="22" font-size="11" font-weight="600" fill="#60a5fa">20/10</text>
+    <text x="581" y="22" font-size="11" font-weight="600" fill="#60a5fa">21/10</text>
+    <text x="644" y="22" font-size="11" font-weight="600" fill="#60a5fa">22/10</text>
+    <text x="707" y="22" font-size="11" font-weight="600" fill="#60a5fa">23/10</text>
+    <text x="770" y="22" font-size="11" font-weight="600" fill="#60a5fa">24/10</text>
+    <text x="833" y="22" font-size="11" font-weight="600" fill="#60a5fa">25/10</text>
+    <text x="896" y="22" font-size="11" font-weight="600" fill="#60a5fa">26/10</text>
+    <text x="959" y="22" font-size="11" font-weight="600" fill="#60a5fa">27/10</text>
+    <text x="1022" y="22" font-size="11" font-weight="600" fill="#60a5fa">28/10</text>
+    <text x="1085" y="22" font-size="11" font-weight="600" fill="#60a5fa">29/10</text>
+    <text x="1148" y="22" font-size="11" font-weight="600" fill="#60a5fa">30/10</text>
+  </g>
+
+  <!-- Vertical grid lines -->
+  <g stroke="#334155" stroke-dasharray="3,3" opacity="0.4" transform="translate(0, 150)">
+    <line x1="470" y1="0" x2="470" y2="610"/>
+    <line x1="533" y1="0" x2="533" y2="610"/>
+    <line x1="596" y1="0" x2="596" y2="610"/>
+    <line x1="659" y1="0" x2="659" y2="610"/>
+    <line x1="722" y1="0" x2="722" y2="610"/>
+    <line x1="785" y1="0" x2="785" y2="610"/>
+    <line x1="848" y1="0" x2="848" y2="610"/>
+    <line x1="911" y1="0" x2="911" y2="610"/>
+    <line x1="974" y1="0" x2="974" y2="610"/>
+    <line x1="1037" y1="0" x2="1037" y2="610"/>
+    <line x1="1100" y1="0" x2="1100" y2="610"/>
+    <line x1="1163" y1="0" x2="1163" y2="610"/>
+  </g>
+
+  <!-- SPRINT 1 SECTION -->
+  <g transform="translate(50, 160)">
+    <!-- Section Title -->
+    <rect x="0" y="0" width="1180" height="24" rx="4" fill="#1e1b4b" opacity="0.8"/>
+    <text x="12" y="16" font-size="12" font-weight="700" fill="#a5b4fc">SPRINT 1 : SOCLE ARCHITECTURE, DOCKER &amp; AUTHENTIFICATION RBAC</text>
+
+    <!-- Task 1: TOOL-2 Docker (Ayman) 19-20/10 -->
+    <text x="15" y="44" font-size="12" fill="#e2e8f0">[TOOL-2] Environnement Docker &amp; Mongo 7</text>
+    <text x="310" y="44" font-size="11" fill="#94a3b8">Ayman</text>
+    <rect x="395" y="32" width="116" height="18" rx="4" fill="url(#barAyman)"/>
+    <text x="402" y="45" font-size="10" font-weight="600" fill="#064e3b">19-20/10 (2j)</text>
+
+    <!-- Task 2: TOOL-5 UML (Khadija) 19-21/10 CRIT -->
+    <text x="15" y="70" font-size="12" font-weight="600" fill="#fda4af">[TOOL-5] Architecture &amp; Diagramme UML</text>
+    <text x="310" y="70" font-size="11" fill="#94a3b8">Khadija</text>
+    <rect x="395" y="58" width="180" height="18" rx="4" fill="url(#barCrit)"/>
+    <text x="402" y="71" font-size="10" font-weight="600" fill="#fff">19-21/10 (3j) [CRITIQUE]</text>
+
+    <!-- Task 3: TOOL-8 Models (Khadija) 20-21/10 CRIT -->
+    <text x="15" y="96" font-size="12" font-weight="600" fill="#fda4af">[TOOL-8] Schémas Mongoose stricts &amp; Modèles</text>
+    <text x="310" y="96" font-size="11" fill="#94a3b8">Khadija</text>
+    <rect x="458" y="84" width="117" height="18" rx="4" fill="url(#barCrit)"/>
+    <text x="465" y="97" font-size="10" font-weight="600" fill="#fff">20-21/10 (2j)</text>
+
+    <!-- Milestone 1 -->
+    <polygon points="575,85 583,93 575,101 567,93" fill="#fbbf24"/>
+    <text x="590" y="97" font-size="10" font-weight="700" fill="#fbbf24">Jalon M1 (21/10)</text>
+
+    <!-- Task 4: TOOL-12 Installation (Khadija) 22-23/10 CRIT -->
+    <text x="15" y="122" font-size="12" font-weight="600" fill="#fda4af">[TOOL-12] Installation unique /api/installation</text>
+    <text x="310" y="122" font-size="11" fill="#94a3b8">Khadija</text>
+    <rect x="584" y="110" width="116" height="18" rx="4" fill="url(#barCrit)"/>
+    <text x="591" y="123" font-size="10" font-weight="600" fill="#fff">22-23/10 (2j)</text>
+
+    <!-- Task 5: TOOL-16 Auth & Profil (Ayman) 23-24/10 -->
+    <text x="15" y="148" font-size="12" fill="#e2e8f0">[TOOL-16] Authentification JWT &amp; Hash Bcrypt</text>
+    <text x="310" y="148" font-size="11" fill="#94a3b8">Ayman</text>
+    <rect x="647" y="136" width="116" height="18" rx="4" fill="url(#barAyman)"/>
+    <text x="654" y="149" font-size="10" font-weight="600" fill="#064e3b">23-24/10 (2j)</text>
+
+    <!-- Task 6: TOOL-20 RBAC (Khadija) 23-24/10 CRIT -->
+    <text x="15" y="174" font-size="12" font-weight="600" fill="#fda4af">[TOOL-20] Gestion des Comptes &amp; Rôles RBAC</text>
+    <text x="310" y="174" font-size="11" fill="#94a3b8">Khadija</text>
+    <rect x="647" y="162" width="116" height="18" rx="4" fill="url(#barCrit)"/>
+    <text x="654" y="175" font-size="10" font-weight="600" fill="#fff">23-24/10 (2j)</text>
+
+    <!-- Milestone 2 -->
+    <polygon points="763,163 771,171 763,179 755,171" fill="#fbbf24"/>
+    <text x="778" y="175" font-size="10" font-weight="700" fill="#fbbf24">Jalon M2 (24/10)</text>
+  </g>
+
+  <!-- SPRINT 2 SECTION -->
+  <g transform="translate(50, 360)">
+    <!-- Section Title -->
+    <rect x="0" y="0" width="1180" height="24" rx="4" fill="#064e3b" opacity="0.8"/>
+    <text x="12" y="16" font-size="12" font-weight="700" fill="#6ee7b7">SPRINT 2 : GESTION DES MAGASINS, INVENTAIRE &amp; MOTEUR DE RÉSERVATION</text>
+
+    <!-- Task 7: TOOL-25 Magasins (Khadija) 24-25/10 CRIT -->
+    <text x="15" y="44" font-size="12" font-weight="600" fill="#fda4af">[TOOL-25] CRUD Magasins &amp; Affectation Gestionnaire</text>
+    <text x="310" y="44" font-size="11" fill="#94a3b8">Khadija</text>
+    <rect x="710" y="32" width="116" height="18" rx="4" fill="url(#barCrit)"/>
+    <text x="717" y="45" font-size="10" font-weight="600" fill="#fff">24-25/10 (2j)</text>
+
+    <!-- Task 8: TOOL-29 Matériels (Ayman) 25-26/10 -->
+    <text x="15" y="70" font-size="12" fill="#e2e8f0">[TOOL-29] Inventaire Matériel &amp; Référence Unique</text>
+    <text x="310" y="70" font-size="11" fill="#94a3b8">Ayman</text>
+    <rect x="773" y="58" width="116" height="18" rx="4" fill="url(#barAyman)"/>
+    <text x="780" y="71" font-size="10" font-weight="600" fill="#064e3b">25-26/10 (2j)</text>
+
+    <!-- Task 9: TOOL-34 Moteur Réservation (Khadija) 26-27/10 CRIT -->
+    <text x="15" y="96" font-size="12" font-weight="600" fill="#fda4af">[TOOL-34] Moteur Réservation sans Chevauchement</text>
+    <text x="310" y="96" font-size="11" fill="#94a3b8">Khadija</text>
+    <rect x="836" y="84" width="116" height="18" rx="4" fill="url(#barCrit)"/>
+    <text x="843" y="97" font-size="10" font-weight="600" fill="#fff">26-27/10 (2j) [CRITIQUE]</text>
+
+    <!-- Task 10: TOOL-38 Concurrence ACID (Ayman) 27-28/10 -->
+    <text x="15" y="122" font-size="12" fill="#e2e8f0">[TOOL-38] Concurrence ACID &amp; Sessions MongoDB</text>
+    <text x="310" y="122" font-size="11" fill="#94a3b8">Ayman</text>
+    <rect x="899" y="110" width="116" height="18" rx="4" fill="url(#barAyman)"/>
+    <text x="906" y="123" font-size="10" font-weight="600" fill="#064e3b">27-28/10 (2j)</text>
+
+    <!-- Task 11: TOOL-41 Annulation Réservations (Khadija) 27-28/10 -->
+    <text x="15" y="148" font-size="12" fill="#e2e8f0">[TOOL-41] Consultation &amp; Annulation Réservations</text>
+    <text x="310" y="148" font-size="11" fill="#94a3b8">Khadija</text>
+    <rect x="899" y="136" width="116" height="18" rx="4" fill="url(#barKhadija)"/>
+    <text x="906" y="149" font-size="10" font-weight="600" fill="#082f49">27-28/10 (2j)</text>
+
+    <!-- Milestone 3 -->
+    <polygon points="1015,137 1023,145 1015,153 1007,145" fill="#fbbf24"/>
+    <text x="1030" y="149" font-size="10" font-weight="700" fill="#fbbf24">Jalon M3 (28/10)</text>
+  </g>
+
+  <!-- SPRINT 3 SECTION -->
+  <g transform="translate(50, 535)">
+    <!-- Section Title -->
+    <rect x="0" y="0" width="1180" height="24" rx="4" fill="#78350f" opacity="0.8"/>
+    <text x="12" y="16" font-size="12" font-weight="700" fill="#fde68a">SPRINT 3 : CYCLE DES EMPRUNTS, TESTS AUTOMATISÉS &amp; LIVRABLES</text>
+
+    <!-- Task 12: TOOL-46 Handover (Ayman) 28-29/10 -->
+    <text x="15" y="44" font-size="12" fill="#e2e8f0">[TOOL-46] Remise Matériel &amp; dateReelleSortie</text>
+    <text x="310" y="44" font-size="11" fill="#94a3b8">Ayman</text>
+    <rect x="962" y="32" width="116" height="18" rx="4" fill="url(#barAyman)"/>
+    <text x="969" y="45" font-size="10" font-weight="600" fill="#064e3b">28-29/10 (2j)</text>
+
+    <!-- Task 13: TOOL-49 Retour & Dommages (Khadija) 28-29/10 CRIT -->
+    <text x="15" y="70" font-size="12" font-weight="600" fill="#fda4af">[TOOL-49] Retour, Constat Dommage &amp; INDISPONIBLE</text>
+    <text x="310" y="70" font-size="11" fill="#94a3b8">Khadija</text>
+    <rect x="962" y="58" width="116" height="18" rx="4" fill="url(#barCrit)"/>
+    <text x="969" y="71" font-size="10" font-weight="600" fill="#fff">28-29/10 (2j)</text>
+
+    <!-- Task 14: TOOL-52 Overdue (Ayman) 29/10 -->
+    <text x="15" y="96" font-size="12" fill="#e2e8f0">[TOOL-52] Suivi des Retards (/api/borrowings/overdue)</text>
+    <text x="310" y="96" font-size="11" fill="#94a3b8">Ayman</text>
+    <rect x="1025" y="84" width="60" height="18" rx="4" fill="url(#barAyman)"/>
+    <text x="1030" y="97" font-size="10" font-weight="600" fill="#064e3b">29/10 (1j)</text>
+
+    <!-- Task 15: TOOL-56 Suite Tests (Ayman/Khadija) 29-30/10 CRIT -->
+    <text x="15" y="122" font-size="12" font-weight="600" fill="#fda4af">[TOOL-56] Suite 137 Tests Automatisés (node --test)</text>
+    <text x="310" y="122" font-size="11" fill="#94a3b8">Équipe</text>
+    <rect x="1025" y="110" width="126" height="18" rx="4" fill="url(#barCrit)"/>
+    <text x="1032" y="123" font-size="10" font-weight="600" fill="#fff">29-30/10 (2j)</text>
+
+    <!-- Task 16: TOOL-61 & 62 Swagger & README (Khadija) 30/10 -->
+    <text x="15" y="148" font-size="12" fill="#e2e8f0">[TOOL-61/62] Swagger OpenAPI 3.0 &amp; README</text>
+    <text x="310" y="148" font-size="11" fill="#94a3b8">Khadija</text>
+    <rect x="1088" y="136" width="63" height="18" rx="4" fill="url(#barKhadija)"/>
+    <text x="1093" y="149" font-size="10" font-weight="600" fill="#082f49">30/10</text>
+
+    <!-- Task 17: TOOL-63 Plan Tests & Gantt (Khadija) 30/10 CRIT -->
+    <text x="15" y="174" font-size="12" font-weight="600" fill="#fda4af">[TOOL-63] Plan de Tests, Gantt &amp; Cohérence Jira</text>
+    <text x="310" y="174" font-size="11" fill="#94a3b8">Khadija</text>
+    <rect x="1088" y="162" width="63" height="18" rx="4" fill="url(#barCrit)"/>
+    <text x="1093" y="175" font-size="10" font-weight="600" fill="#fff">30/10</text>
+
+    <!-- Final Milestone 5 -->
+    <polygon points="1151,163 1159,171 1151,179 1143,171" fill="#fbbf24"/>
+    <text x="1105" y="195" font-size="11" font-weight="700" fill="#fbbf24">Jalon M5 : Release v1.0 (30/10)</text>
+  </g>
+
+  <!-- Footer Stats -->
+  <g transform="translate(50, 755)">
+    <rect x="0" y="0" width="1180" height="28" rx="6" fill="#0f172a" stroke="#334155" stroke-width="1"/>
+    <text x="20" y="18" font-size="11" font-weight="600" fill="#94a3b8">MÉTRIQUES CLÉS :</text>
+    <text x="140" y="18" font-size="11" fill="#cbd5e1">Durée : 12 Jours Ouvrés</text>
+    <text x="320" y="18" font-size="11" fill="#cbd5e1">Vélocité : 100% des Stories livrées</text>
+    <text x="560" y="18" font-size="11" fill="#cbd5e1">Chemin Critique : 7 Étapes sans retard</text>
+    <text x="830" y="18" font-size="11" fill="#34d399">Taux de Succès Tests : 136/136 Pass (100%)</text>
+  </g>
+</svg>
