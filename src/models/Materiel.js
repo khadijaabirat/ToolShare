@@ -7,6 +7,12 @@ const MaterielSchema=new mongoose.Schema({
     unique:true,
     trim:true
  },
+ referenceKey:{
+    type:String,
+    required:true,
+    trim:true,
+    lowercase:true
+ },
  nom:{
     type:String,
     required:true,
@@ -37,7 +43,11 @@ const MaterielSchema=new mongoose.Schema({
  }
 
 },{
-    timestamps:true
+    timestamps:true,
+    autoIndex:false
 });
+
+// Declared for the explicit rollout migration; automatic index creation is disabled.
+MaterielSchema.index({ referenceKey: 1 }, { unique: true });
 
 module.exports=mongoose.model('Materiel',MaterielSchema);

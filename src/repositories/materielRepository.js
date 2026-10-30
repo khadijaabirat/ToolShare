@@ -1,17 +1,65 @@
-const Materiel = require("../models/Materiel");
+'use strict';
 
-class materielRepository{
+const Materiel = require('../models/Materiel');
 
-    async findMaterielById(id){
-        return await Materiel.findById(id);
-    }
+function duplicateReferenceError(error) {
+  const keyPattern = error && error.keyPattern;
+  const keyValue = error && error.keyValue;
+  const duplicateIndex = error && typeof error.message === 'string' &&
+    /(?:reference|referenceKey)_1/.test(error.message);
+  const duplicateField = (fields) => fields &&
+    (Object.prototype.hasOwnProperty.call(fields, 'reference') ||
+      Object.prototype.hasOwnProperty.call(fields, 'referenceKey'));
 
-    async UpdateMateriel(id,update){
-        return await Materiel.findByIdAndUpdate(
-                    id,
-                    { statut: update },
-                    { new: true, runValidators: true }
-                );
-    }
+  if (!error || error.code !== 11000 ||
+      (!duplicateField(keyPattern) && !duplicateField(keyValue) && !duplicateIndex)) {
+    return null;
+  }
+
+  const conflict = new Error('Une référence matériel identique existe déjà.');
+  conflict.statusCode = 409;
+  conflict.code = 'DUPLICATE_REFERENCE';
+  return conflict;
 }
-module.exports=new materielRepository();
+
+class MaterielRepository {
+  create(data) {
+    return Materiel.create(data).catch((error) => {
+      throw duplicateReferenceError(error) || error;
+    });
+  }
+
+  findMany(filter) {
+    return Materiel.find(filter);
+  }
+
+  findById(id) {
+    return Materiel.findById(id);
+  }
+
+  findByReferenceKey(referenceKey, excludeId) {
+    const filter = { referenceKey };
+    if (excludeId) filter._id = { $ne: excludeId };
+    return Materiel.findOne(filter).select('_id');
+  }
+
+  updateFields(id, updates) {
+    return Materiel.findByIdAndUpdate(
+      id,
+      { $set: updates },
+      { new: true, runValidators: true }
+    ).catch((error) => {
+      throw duplicateReferenceError(error) || error;
+    });
+  }
+
+  setActivation(id, isActive) {
+    return Materiel.findByIdAndUpdate(
+      id,
+      { $set: { isActive } },
+      { new: true, runValidators: true }
+    );
+  }
+}
+
+module.exports = new MaterielRepository();
