@@ -1,17 +1,26 @@
 const Materiel = require("../models/Materiel");
 
-class materielRepository{
-
-    async findMaterielById(id){
+class materielRepository {
+    async findById(id) {
         return await Materiel.findById(id);
     }
 
-    async UpdateMateriel(id,update){
+    async findMaterielById(id) {
+        return await this.findById(id);
+    }
+
+    async updateFields(id, update) {
+        const payload = typeof update === 'string' ? { statut: update } : update;
         return await Materiel.findByIdAndUpdate(
-                    id,
-                    { statut: update },
-                    { new: true, runValidators: true }
-                );
+            id,
+            payload,
+            { new: true, runValidators: true }
+        );
+    }
+
+    async UpdateMateriel(id, update) {
+        return await this.updateFields(id, update);
     }
 }
-module.exports=new materielRepository();
+
+module.exports = new materielRepository();
