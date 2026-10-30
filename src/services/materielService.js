@@ -5,9 +5,10 @@ const materielRepository = require('../repositories/materielRepository');
 const magasinRepository = require('../repositories/magasinRepository');
 const { normalizeReference } = require('../utils/materialReferenceAudit');
 
-const OBJECT_ID_PATTERN = /^[a-f\d]{24}$/i;
+const OBJECT_ID_PATTERN = /^[a-f\\d]{24}$/i;
 const CREATE_FIELDS = new Set(['reference', 'nom', 'categorie', 'description', 'magasinId']);
 const UPDATE_FIELDS = new Set(['reference', 'nom', 'categorie', 'description']);
+const MATERIAL_STATUSES = new Set(['DISPONIBLE', 'INDISPONIBLE']);
 
 function serviceError(statusCode, message) {
   const error = new Error(message);
@@ -166,6 +167,27 @@ class MaterielService {
       throw serviceError(400, 'Le champ isActive doit être un booléen.');
     }
     return materielRepository.setActivation(material._id, isActive);
+  }
+
+  async changerStatutMateriel(material, caller, nouveauStatut) {
+    assertPermittedCaller(caller);
+    if (!MATERIAL_STATUSES.has(nouveauStatut)) {
+      throw serviceError(400, 'Le statut doit être DISPONIBLE ou INDISPONIBLE.');
+    }
+    if (!material) {
+      throw serviceError(404, 'Matériel introuvable.');
+    }
+    if (caller.role === 'Gestionnaire' &&
+        String(material.magasinId) !== String(caller.magasinId)) {
+      throw serviceError(403, 'Accès refusé : ce matériel n\'appartient pas à votre magasin.');
+    }
+    if (material.isActive === false) {
+      throw serviceError(400, 'Impossible de modifier le statut d\'un matériel inactif.');
+    }
+
+    const updated = await materielRepository.updateMaterielStatut(material._id, nouveauStatut);
+    if (!updated) throw serviceError(404, 'Matériel introuvable.');
+    return updated;
   }
 }
 
