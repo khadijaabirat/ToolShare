@@ -1,3 +1,5 @@
+const magasinRepository = require("../repositories/magasinRepository");
+const materielRepository = require("../repositories/materielRepository");
 const reservationRepository = require("../repositories/reservationRepository");
 
 class reservationService{
@@ -37,6 +39,35 @@ return true;
 
 async createReservation({userId,magasinId,materielId,dateDebut,dureeHeures}){
     const dates = await this.calculeDatesReservation(dateDebut,dureeHeures);
+    const materiel=await materielRepository.findMaterielById(materielId);
+    if(!materiel){
+        const err = new Error('ce matériel introuvable');
+        err.statusCode=404;
+        throw err;
+    }
+    if(materiel.magasinId.toString()!==magasinId.toString()){
+        const err = new Error('ce matériel n appartient pas a ce magasin');
+        err.statusCode=404;
+        throw err; 
+    }
+       
+    if(materiel.statut=="INDISPONIBLE"){
+        const err = new Error('ce materiel  INDISPONIBLE');
+        err.statusCode=400;
+        throw err; 
+    }
+       if(!materiel.isActive ){
+        const err = new Error('ce materiel désactivé');
+        err.statusCode=400;
+        throw err; 
+    }
+    const magasinActiv= await magasinRepository.getMagasinActive();
+    const isMagasinActive=magasinActiv.some(m=>m._id.toString()===magasinId.toString());
+    if(!isMagasinActive){
+        const err = new Error('ce magasin desactive');
+        err.statusCode=400;
+        throw err; 
+    }
     if(await this.checkAvailability(materielId,dates.dateDebut,dates.dateFin)){
         return await reservationRepository.createReservation({userId,magasinId,materielId, ...dates});
     }

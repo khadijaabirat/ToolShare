@@ -1,5 +1,5 @@
 const Reservation= require('../models/Reservation');
-const Materiel=require('../models/Materiel');
+ const materielRepository = require('./materielRepository');
 class reservationRepository{
     async findOverlappingReservation(materielId, ndateDebut, ndateFin) {
         return await Reservation.findOne({
@@ -22,6 +22,7 @@ class reservationRepository{
         .populate('magasinId','nom adresse site')
     }
 
+
     async annulerReservation(id){
         return await Reservation.findByIdAndUpdate(id , {statut:"ANNULEE"},
             {
@@ -30,9 +31,13 @@ class reservationRepository{
         }
     );
    }
+
+
    async getReservation(id){
 return await Reservation.findById(id);
    }
+
+   
    async getReservationWithFilter(filter){
     const Reservations=await Reservation.find(filter)
     .populate('materielId','nom reference')
@@ -50,14 +55,11 @@ return await Reservation.findById(id);
         { new: true, runValidators: true }
     );
     if (reservation && reservation.materielId) {
-        await Materiel.findByIdAndUpdate(
-            reservation.materielId,
-            { statut: statutToSave },
-            { new: true, runValidators: true }
-        );
+        await materielRepository.UpdateMateriel(reservation.materielId, statutToSave);
     }
     return reservation;
    }
+
 
 
 }
