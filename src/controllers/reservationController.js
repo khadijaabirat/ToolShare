@@ -1,0 +1,98 @@
+ const reservationService = require("../services/reservationService");
+
+async function Create(req,res,next){
+try{ 
+    const data ={
+        userId:req.user.id,
+        magasinId:req.body.magasinId,
+        materielId:req.body.materielId,
+        dateDebut:req.body.dateDebut,
+        dureeHeures:req.body.dureeHeures
+    }
+    if(!data.userId || !data.magasinId || !data.materielId || !data.dateDebut || !data.dureeHeures){
+        return res.status(400).json({
+            success:false,
+            message:'les champs sont obligatoire'
+        });
+    }
+const reservation = await reservationService.createReservation(data);
+return res.status(201).json({
+    success:true,
+    message:'la reservation creé avec succes',
+    data:reservation
+});
+}
+catch(error){
+    next(error);
+}
+}
+
+
+async function getMyReservations(req,res,next){
+    try{
+        const reservations= await reservationService.getMyReservation(req.user.id);
+        return res.status(200).json({
+            success:true,
+            data: reservations
+        });
+    }
+    catch(error){
+        next(error);
+    }
+
+}
+
+async function annulerReservation(req,res,next){
+    try{
+        const userId=req.user.id;
+        const id=req.params.id;
+    const reservation= await reservationService.annulationReservation(id,userId);
+return res.status(200).json({
+    success:true,
+    message:"la reservation annuler avec sucess",
+    data:reservation
+})
+    }catch(error){
+next(error);
+    }
+
+}
+
+
+async function getReservations(req,res,next){
+    try{
+        const user=req.user;
+        const filter= req.query;
+const reservations= await reservationService.getreservationsWithFilter(user,filter);
+res.status(200).json({
+    success:true,
+    data:reservations
+})
+    }catch(error){
+        next(error);
+    }
+    
+}
+
+
+async function enregistrerRetour(req, res, next){
+try{
+    const id = req.params.id;
+    const user = req.user;
+    const etatRetour= req.body.etatRetour;
+   const reservation= await reservationService.enregistrerRetour(id,user,etatRetour);
+   
+   res.status(200).json({
+    success:true,
+    message:'l enregistrement de retour passe bien ',
+    data:reservation
+   });
+    
+
+}catch(error){
+next(error);
+}
+}
+module.exports={
+    Create, getMyReservations,annulerReservation,getReservations,enregistrerRetour
+}

@@ -17,6 +17,7 @@ const http = require('node:http');
 const { randomBytes } = require('node:crypto');
 const jwt = require('jsonwebtoken');
 const mongoose = require('mongoose');
+const { verifyPassword } = require('../../src/utils/password');
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -74,6 +75,7 @@ function buildApp(opts = {}) {
         '../../src/controllers/userController',
         '../../src/services/userService',
         '../../src/repositories/userRepository',
+        '../../src/repositories/magasinRepository',
         '../../src/middlewares/authMiddleware',
         '../../src/middlewares/roleMiddleware',
     ];
@@ -102,6 +104,11 @@ function buildApp(opts = {}) {
     // Patch the require cache so that userService picks up our mock repo.
     const repoPath = require.resolve('../../src/repositories/userRepository');
     require.cache[repoPath].exports = repoMod;
+
+    const magasinRepo = require('../../src/repositories/magasinRepository');
+    const magasinOverrides = opts.magasinOverrides || {};
+    magasinRepo.findActiveMagasinById = magasinOverrides.findActiveMagasinById ||
+        ((id) => Promise.resolve({ _id: id, isActive: true }));
 
     // --- Load app ---
     const app = require('../../src/app');
@@ -134,6 +141,14 @@ async function req(url, method, body, token) {
     let json = null;
     try { json = await res.json(); } catch (_) { /* empty body */ }
     return { status: res.status, json };
+}
+
+function assertApiError(result, status, messageFragment) {
+    assert.equal(result.status, status);
+    assert.deepEqual(Object.keys(result.json).sort(), ['message']);
+    assert.equal(typeof result.json.message, 'string');
+    assert.ok(result.json.message.includes(messageFragment),
+        `expected error message to include "${messageFragment}", got "${result.json.message}"`);
 }
 
 // ---------------------------------------------------------------------------
@@ -189,57 +204,254 @@ describe('POST /api/users', () => {
         assert.equal(json.success, true);
     });
 
-    test('Gestionnaire can create an Utilisateur', async () => {
+    test('Gestionnaire creates an Utilisateur in their assigned magasin', async () => {
+        let captured;
+        const app2 = buildApp({
+            repoOverrides: {
+                findByEmail: () => Promise.resolve(null),
+                createUser: (data) => {
+                    captured = data;
+                    return Promise.resolve({ _id: newUserId, ...data });
+                },
+            },
+        });
+        const { server: s2, url: u2 } = await startServer(app2);
         const token = sign({ sub: gestId });
-        const { status, json } = await req(`${url}/api/users`, 'POST', {
+        const { status, json } = await req(`${u2}/api/users`, 'POST', {
             nom: 'Util', prenom: 'One', email: 'util2@test.com',
             password: 'Secret123!', role: 'Utilisateur',
         }, token);
+        await new Promise((r) => s2.close(r));
         assert.equal(status, 201);
         assert.equal(json.success, true);
+        assert.equal(String(captured.magasinId), magasinId);
+    });
+
+    test('Gestionnaire cannot override their assigned magasin with a client-supplied ID', async () => {
+        const otherMagasinId = fakeId();
+        let captured;
+        const app2 = buildApp({
+            repoOverrides: {
+                findByEmail: () => Promise.resolve(null),
+                createUser: (data) => {
+                    captured = data;
+                    return Promise.resolve({ _id: newUserId, ...data });
+                },
+            },
+        });
+        const { server: s2, url: u2 } = await startServer(app2);
+        const { status, json } = await req(`${u2}/api/users`, 'POST', {
+            nom: 'Util', prenom: 'Two', email: 'util3@test.com',
+            password: 'Secret123!', role: 'Utilisateur', magasinId: otherMagasinId,
+        }, sign({ sub: gestId }));
+        await new Promise((r) => s2.close(r));
+        assert.equal(status, 201);
+        assert.equal(json.success, true);
+        assert.equal(String(json.data.magasinId), magasinId);
+        assert.equal(String(captured.magasinId), magasinId);
+        assert.notEqual(String(captured.magasinId), otherMagasinId);
+    });
+
+    test('Gestionnaire without a valid active store assignment is denied', async () => {
+        for (const [callerMagasinId, expectedMessage] of [
+            [null, 'affectation magasin valide'],
+            ['not-a-valid-id', 'affectation magasin valide'],
+        ]) {
+            let createCalls = 0;
+            const app2 = buildApp({
+                repoOverrides: {
+                    findUserById: (id) => Promise.resolve(id === gestId
+                        ? { ...USERS_DB[gestId], magasinId: callerMagasinId }
+                        : USERS_DB[id] || null),
+                    createUser: () => { createCalls += 1; return Promise.resolve({ _id: newUserId }); },
+                },
+            });
+            const { server: s2, url: u2 } = await startServer(app2);
+            const result = await req(`${u2}/api/users`, 'POST', {
+                nom: 'Util', prenom: 'Three', email: `util-${String(callerMagasinId)}@test.com`,
+                password: 'Secret123!', role: 'Utilisateur',
+            }, sign({ sub: gestId }));
+            await new Promise((r) => s2.close(r));
+            assertApiError(result, 403, expectedMessage);
+            assert.equal(createCalls, 0);
+        }
+
+        let createCalls = 0;
+        const inactiveStoreApp = buildApp({
+            magasinOverrides: { findActiveMagasinById: () => Promise.resolve(null) },
+            repoOverrides: {
+                createUser: () => { createCalls += 1; return Promise.resolve({ _id: newUserId }); },
+            },
+        });
+        const { server: s3, url: u3 } = await startServer(inactiveStoreApp);
+        const inactiveResult = await req(`${u3}/api/users`, 'POST', {
+            nom: 'Util', prenom: 'Inactive store', email: 'util-inactive-store@test.com',
+            password: 'Secret123!', role: 'Utilisateur',
+        }, sign({ sub: gestId }));
+        await new Promise((r) => s3.close(r));
+        assertApiError(inactiveResult, 403, 'introuvable');
+        assert.equal(createCalls, 0);
+    });
+
+    test('Admin can create an account for another valid active magasin', async () => {
+        const otherMagasinId = fakeId();
+        let captured;
+        const app2 = buildApp({
+            repoOverrides: {
+                findByEmail: () => Promise.resolve(null),
+                createUser: (data) => {
+                    captured = data;
+                    return Promise.resolve({ _id: newUserId, ...data });
+                },
+            },
+        });
+        const { server: s2, url: u2 } = await startServer(app2);
+        const { status } = await req(`${u2}/api/users`, 'POST', {
+            nom: 'Util', prenom: 'Four', email: 'admin-created@test.com',
+            password: 'Secret123!', role: 'Utilisateur', magasinId: otherMagasinId,
+        }, sign({ sub: adminId }));
+        await new Promise((r) => s2.close(r));
+        assert.equal(status, 201);
+        assert.equal(String(captured.magasinId), otherMagasinId);
+    });
+
+    test('Admin rejects a magasin with no active matching record', async () => {
+        let createCalls = 0;
+        const app2 = buildApp({
+            magasinOverrides: { findActiveMagasinById: () => Promise.resolve(null) },
+            repoOverrides: {
+                createUser: () => { createCalls += 1; return Promise.resolve({ _id: newUserId }); },
+            },
+        });
+        const { server: s2, url: u2 } = await startServer(app2);
+        const result = await req(`${u2}/api/users`, 'POST', {
+            nom: 'Util', prenom: 'Five', email: 'admin-invalid-store@test.com',
+            password: 'Secret123!', role: 'Utilisateur', magasinId,
+        }, sign({ sub: adminId }));
+        await new Promise((r) => s2.close(r));
+        assertApiError(result, 400, 'magasin fourni est introuvable');
+        assert.equal(createCalls, 0);
+
+        const Magasin = require('../../src/models/Magasin');
+        const repositoryPath = require.resolve('../../src/repositories/magasinRepository');
+        delete require.cache[repositoryPath];
+        const actualMagasinRepository = require(repositoryPath);
+        const originalFindOne = Magasin.findOne;
+        let capturedFilter;
+        Magasin.findOne = (filter) => {
+            capturedFilter = filter;
+            return Promise.resolve(null);
+        };
+        try {
+            await actualMagasinRepository.findActiveMagasinById(magasinId);
+        } finally {
+            Magasin.findOne = originalFindOne;
+            delete require.cache[repositoryPath];
+        }
+        assert.deepEqual(capturedFilter, { _id: magasinId, isActive: true });
+
+        let malformedStoreCreateCalls = 0;
+        const app3 = buildApp({
+            repoOverrides: {
+                createUser: () => { malformedStoreCreateCalls += 1; return Promise.resolve({ _id: newUserId }); },
+            },
+        });
+        const { server: s3, url: u3 } = await startServer(app3);
+        const malformedResult = await req(`${u3}/api/users`, 'POST', {
+            nom: 'Util', prenom: 'Six', email: 'admin-malformed-store@test.com',
+            password: 'Secret123!', role: 'Utilisateur', magasinId: 'bad-id',
+        }, sign({ sub: adminId }));
+        await new Promise((r) => s3.close(r));
+        assertApiError(malformedResult, 400, 'magasinId invalide');
+        assert.equal(malformedStoreCreateCalls, 0);
     });
 
     test('Gestionnaire cannot create a Gestionnaire (403)', async () => {
+        let createCalls = 0;
+        const app2 = buildApp({
+            repoOverrides: {
+                createUser: () => { createCalls += 1; return Promise.resolve({ _id: newUserId }); },
+            },
+        });
+        const { server: s2, url: u2 } = await startServer(app2);
         const token = sign({ sub: gestId });
-        const { status, json } = await req(`${url}/api/users`, 'POST', {
+        const result = await req(`${u2}/api/users`, 'POST', {
             nom: 'Gest', prenom: 'Two', email: 'gest3@test.com',
             password: 'Secret123!', role: 'Gestionnaire', magasinId,
         }, token);
-        assert.equal(status, 403);
+        await new Promise((r) => s2.close(r));
+        assertApiError(result, 403, 'Vous ne pouvez pas');
+        assert.equal(createCalls, 0);
     });
 
     test('Gestionnaire cannot create an Admin (403)', async () => {
+        let createCalls = 0;
+        const app2 = buildApp({
+            repoOverrides: {
+                createUser: () => { createCalls += 1; return Promise.resolve({ _id: newUserId }); },
+            },
+        });
+        const { server: s2, url: u2 } = await startServer(app2);
         const token = sign({ sub: gestId });
-        const { status, json } = await req(`${url}/api/users`, 'POST', {
+        const result = await req(`${u2}/api/users`, 'POST', {
             nom: 'Admin', prenom: 'X', email: 'admin3@test.com',
             password: 'Secret123!', role: 'Admin',
         }, token);
-        assert.equal(status, 403);
+        await new Promise((r) => s2.close(r));
+        assertApiError(result, 403, 'Vous ne pouvez pas');
+        assert.equal(createCalls, 0);
     });
 
-    test('Utilisateur is denied (403 from roleMiddleware)', async () => {
+    test('Utilisateur is denied with an authorization error before user creation', async () => {
+        let createCalls = 0;
+        const app2 = buildApp({
+            repoOverrides: {
+                createUser: () => { createCalls += 1; return Promise.resolve({ _id: newUserId }); },
+            },
+        });
+        const { server: s2, url: u2 } = await startServer(app2);
         const token = sign({ sub: utilisId });
-        const { status } = await req(`${url}/api/users`, 'POST', {
+        const result = await req(`${u2}/api/users`, 'POST', {
             nom: 'A', prenom: 'B', email: 'c@d.com',
             password: 'pass', role: 'Utilisateur',
         }, token);
-        assert.equal(status, 403);
+        await new Promise((r) => s2.close(r));
+        assertApiError(result, 403, 'permissions');
+        assert.equal(createCalls, 0);
     });
 
-    test('Missing Authorization header returns 401', async () => {
-        const { status } = await req(`${url}/api/users`, 'POST', {
+    test('Missing Authorization header returns an authentication error before user creation', async () => {
+        let createCalls = 0;
+        const app2 = buildApp({
+            repoOverrides: {
+                createUser: () => { createCalls += 1; return Promise.resolve({ _id: newUserId }); },
+            },
+        });
+        const { server: s2, url: u2 } = await startServer(app2);
+        const result = await req(`${u2}/api/users`, 'POST', {
             nom: 'A', prenom: 'B', email: 'c@d.com',
             password: 'pass', role: 'Utilisateur',
         });
-        assert.equal(status, 401);
+        await new Promise((r) => s2.close(r));
+        assertApiError(result, 401, 'Authentification requise');
+        assert.equal(createCalls, 0);
     });
 
-    test('Invalid JWT token returns 401', async () => {
-        const { status } = await req(`${url}/api/users`, 'POST', {
+    test('Invalid JWT token returns an authentication error before user creation', async () => {
+        let createCalls = 0;
+        const app2 = buildApp({
+            repoOverrides: {
+                createUser: () => { createCalls += 1; return Promise.resolve({ _id: newUserId }); },
+            },
+        });
+        const { server: s2, url: u2 } = await startServer(app2);
+        const result = await req(`${u2}/api/users`, 'POST', {
             nom: 'A', prenom: 'B', email: 'c@d.com',
             password: 'pass', role: 'Utilisateur',
         }, 'not.a.valid.token');
-        assert.equal(status, 401);
+        await new Promise((r) => s2.close(r));
+        assertApiError(result, 401, 'Authentification requise');
+        assert.equal(createCalls, 0);
     });
 
     test('A correctly signed token without exp returns 401', async () => {
@@ -274,30 +486,92 @@ describe('POST /api/users', () => {
         assert.equal(status, 401);
     });
 
-    test('Missing required fields returns 400', async () => {
+    test('Missing required fields returns a validation error without creating a user', async () => {
+        let createCalls = 0;
+        const app2 = buildApp({
+            repoOverrides: {
+                createUser: () => { createCalls += 1; return Promise.resolve({ _id: newUserId }); },
+            },
+        });
+        const { server: s2, url: u2 } = await startServer(app2);
         const token = sign({ sub: adminId });
-        const { status } = await req(`${url}/api/users`, 'POST', {
+        const result = await req(`${u2}/api/users`, 'POST', {
             nom: 'OnlyNom',
         }, token);
-        assert.equal(status, 400);
+        await new Promise((r) => s2.close(r));
+        assertApiError(result, 400, 'champs nom, prenom, email, password et role sont obligatoires');
+        assert.equal(createCalls, 0);
     });
 
     test('Malformed account bodies and email values return 400', async () => {
+        let createCalls = 0;
+        const app2 = buildApp({
+            repoOverrides: {
+                createUser: () => { createCalls += 1; return Promise.resolve({ _id: newUserId }); },
+            },
+        });
+        const { server: s2, url: u2 } = await startServer(app2);
         const token = sign({ sub: adminId });
-        for (const body of [null, [], { nom: 'A', prenom: 'B', email: 'invalid', password: 'pw', role: 'Utilisateur' }]) {
-            const { status } = await req(`${url}/api/users`, 'POST', body, token);
-            assert.equal(status, 400);
+        const cases = [
+            [null, 'Corps JSON invalide.'],
+            [[], 'informations du compte sont invalides'],
+            [{ nom: 'A', prenom: 'B', email: 'invalid', password: 'pw', role: 'Utilisateur' }, 'informations du compte sont invalides'],
+        ];
+        const results = [];
+        for (const [body] of cases) {
+            results.push(await req(`${u2}/api/users`, 'POST', body, token));
         }
+        await new Promise((r) => s2.close(r));
+        results.forEach((result, index) => assertApiError(result, 400, cases[index][1]));
+        assert.equal(createCalls, 0);
     });
 
-    test('Response body does not contain password field', async () => {
+    test('Unknown role returns a validation error without creating a user', async () => {
+        let createCalls = 0;
+        const app2 = buildApp({
+            repoOverrides: {
+                createUser: () => { createCalls += 1; return Promise.resolve({ _id: newUserId }); },
+            },
+        });
+        const { server: s2, url: u2 } = await startServer(app2);
+        const result = await req(`${u2}/api/users`, 'POST', {
+            nom: 'A', prenom: 'B', email: 'unknown-role@test.com',
+            password: 'Secret123!', role: 'SUPERADMIN',
+        }, sign({ sub: adminId }));
+        await new Promise((r) => s2.close(r));
+        assertApiError(result, 400, 'Rôle invalide');
+        assert.equal(createCalls, 0);
+    });
+
+    test('Repository receives a bcrypt hash and the response exposes no password value', async () => {
+        const plainPassword = 'Secret123!';
+        let captured;
+        const app2 = buildApp({
+            repoOverrides: {
+                findByEmail: () => Promise.resolve(null),
+                createUser: (data) => {
+                    captured = data;
+                    return Promise.resolve({ _id: newUserId, ...data });
+                },
+            },
+        });
+        const { server: s2, url: u2 } = await startServer(app2);
         const token = sign({ sub: adminId });
-        const { json } = await req(`${url}/api/users`, 'POST', {
+        const { status, json } = await req(`${u2}/api/users`, 'POST', {
             nom: 'Secure', prenom: 'User', email: 'secure@test.com',
-            password: 'Secret123!', role: 'Utilisateur',
+            password: plainPassword, role: 'Utilisateur',
         }, token);
-        // Top-level data object must not have a 'password' key.
-        assert.ok(!('password' in (json.data || {})), 'password must not appear in response');
+        await new Promise((r) => s2.close(r));
+
+        assert.equal(status, 201);
+        assert.equal(typeof captured.password, 'string');
+        assert.notEqual(captured.password, plainPassword);
+        assert.equal(await verifyPassword(plainPassword, captured.password), true);
+        assert.equal(JSON.stringify(captured).includes(plainPassword), false);
+        assert.equal(Object.hasOwn(json.data, 'password'), false);
+        assert.equal(Object.hasOwn(json.data, 'passwordHash'), false);
+        assert.equal(JSON.stringify(json).includes(plainPassword), false);
+        assert.equal(JSON.stringify(json).includes(captured.password), false);
     });
 
     test('createdBy in body is ignored; service sets it from req.user', async () => {
@@ -325,23 +599,26 @@ describe('POST /api/users', () => {
         assert.equal(captured.isActive, true);
     });
 
-    test('Duplicate email returns 409', async () => {
+    test('Duplicate email returns a conflict without creating a user', async () => {
+        let createCalls = 0;
         const app3 = buildApp({
             repoOverrides: {
                 findByEmail: () => Promise.resolve({ _id: 'existing' }),  // email taken
+                createUser: () => { createCalls += 1; return Promise.resolve({ _id: newUserId }); },
             },
         });
         const { server: s3, url: u3 } = await startServer(app3);
         const token = sign({ sub: adminId });
-        const { status } = await req(`${u3}/api/users`, 'POST', {
+        const result = await req(`${u3}/api/users`, 'POST', {
             nom: 'A', prenom: 'B', email: 'taken@test.com',
             password: 'pass', role: 'Utilisateur',
         }, token);
         await new Promise((r) => s3.close(r));
-        assert.equal(status, 409);
+        assertApiError(result, 409, 'email existe');
+        assert.equal(createCalls, 0);
     });
 
-    test('Gestionnaire creating Utilisateur without magasinId succeeds (magasinId not required for Utilisateur)', async () => {
+    test('Gestionnaire creating Utilisateur uses the authenticated magasin without requiring body magasinId', async () => {
         const token = sign({ sub: gestId });
         const { status } = await req(`${url}/api/users`, 'POST', {
             nom: 'U', prenom: 'U', email: 'util99@test.com',
@@ -350,14 +627,23 @@ describe('POST /api/users', () => {
         assert.equal(status, 201);
     });
 
-    test('Creating Gestionnaire without magasinId returns 400', async () => {
+    test('Creating Gestionnaire without magasinId returns a validation error without creating a user', async () => {
+        let createCalls = 0;
+        const app2 = buildApp({
+            repoOverrides: {
+                createUser: () => { createCalls += 1; return Promise.resolve({ _id: newUserId }); },
+            },
+        });
+        const { server: s2, url: u2 } = await startServer(app2);
         const token = sign({ sub: adminId });
-        const { status } = await req(`${url}/api/users`, 'POST', {
+        const result = await req(`${u2}/api/users`, 'POST', {
             nom: 'G', prenom: 'G', email: 'g99@test.com',
             password: 'pass', role: 'Gestionnaire',
             // magasinId intentionally omitted
         }, token);
-        assert.equal(status, 400);
+        await new Promise((r) => s2.close(r));
+        assertApiError(result, 400, 'magasinId requis');
+        assert.equal(createCalls, 0);
     });
 });
 
