@@ -5,19 +5,19 @@ const { createMaterialReferenceAudit } = require('../src/utils/materialReference
 
 const COLLECTION_NAME = 'materiels';
 
-async function auditMaterialCollection(database) {
+async function auditMaterialCollection(database, collectionName = COLLECTION_NAME) {
   const collections = await database.listCollections(
-    { name: COLLECTION_NAME },
+    { name: collectionName },
     { nameOnly: true }
   ).toArray();
 
-  if (!collections.some((collection) => collection.name === COLLECTION_NAME)) {
+  if (!collections.some((collection) => collection.name === collectionName)) {
     const error = new Error('Material collection does not exist; audit was not run.');
     error.code = 'MATERIAL_COLLECTION_NOT_FOUND';
     throw error;
   }
 
-  const collection = database.collection(COLLECTION_NAME);
+  const collection = database.collection(collectionName);
   const cursor = collection.find({}, {
     projection: { reference: 1, referenceKey: 1 },
   });
