@@ -331,10 +331,12 @@ Once the server is running, navigate to:
 | **PUT** | `/api/magasin/:id` | Admin | Update store information |
 | **DELETE**| `/api/magasin/:id` | Admin | Logical deactivation (`isActive: false`) |
 | **PATCH**| `/api/magasin/:id/gestionnaire`| Admin | Assign a manager exclusively to a store |
+| **PATCH**| `/api/materials/:id/status` | Admin, Gestionnaire | Update material status (DISPONIBLE / INDISPONIBLE) |
 | **POST** | `/api/reservations` | Authenticated | Create a reservation (Conflict-free & Concurrency-safe) |
 | **GET** | `/api/reservations/my` | Authenticated | View authenticated user's reservations |
 | **GET** | `/api/reservations` | Admin, Gestionnaire | Filtered reservations (manager scoped) |
 | **DELETE**| `/api/reservations/:id` | Authenticated (Owner)| Cancel reservation before start date |
+| **POST** | `/api/reservations/:id/handover` | Admin, Gestionnaire | Record material handover & actual departure timestamp |
 | **POST** | `/api/reservations/:id/return` | Admin, Gestionnaire | Record return & flag damaged equipment |
 | **GET** | `/api/borrowings/overdue` | Admin, Gestionnaire | Detect overdue borrowings in real-time |
 | **GET** | `/api/borrowings/history` | Authenticated | View complete loan history and return states |
@@ -405,14 +407,14 @@ npm test
 
 *Expected output:*
 ```bash
-Ôä╣ tests 95
-Ôä╣ suites 4
-Ôä╣ pass 94
-Ôä╣ fail 0
-Ôä╣ cancelled 0
-Ôä╣ skipped 1
-Ôä╣ todo 0
-Ôä╣ duration_ms 5040.8727
+Ôä╣ tests 207
+ℹ suites 20
+ℹ pass 205
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 2
+ℹ todo 0
+ℹ duration_ms 6992.2259
 ```
 
 ---
