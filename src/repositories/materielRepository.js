@@ -1,29 +1,5 @@
 'use strict';
 
-class materielRepository {
-    async findById(id) {
-        return await Materiel.findById(id);
-    }
-
-    async findMaterielById(id) {
-        return await this.findById(id);
-    }
-
-    async updateFields(id, update) {
-        const payload = typeof update === 'string' ? { statut: update } : update;
-        return await Materiel.findByIdAndUpdate(
-            id,
-            payload,
-            { new: true, runValidators: true }
-        );
-    }
-
-    async UpdateMateriel(id, update) {
-        return await this.updateFields(id, update);
-    }
-}
-
-module.exports = new materielRepository();
 const Materiel = require('../models/Materiel');
 
 function duplicateReferenceError(error) {
@@ -61,6 +37,10 @@ class MaterielRepository {
     return Materiel.findById(id);
   }
 
+  findMaterielById(id) {
+    return this.findById(id);
+  }
+
   findByReferenceKey(referenceKey, excludeId) {
     const filter = { referenceKey };
     if (excludeId) filter._id = { $ne: excludeId };
@@ -68,13 +48,18 @@ class MaterielRepository {
   }
 
   updateFields(id, updates) {
+    const payload = typeof updates === 'string' ? { statut: updates } : updates;
     return Materiel.findByIdAndUpdate(
       id,
-      { $set: updates },
+      { $set: payload },
       { new: true, runValidators: true }
     ).catch((error) => {
       throw duplicateReferenceError(error) || error;
     });
+  }
+
+  UpdateMateriel(id, update) {
+    return this.updateFields(id, update);
   }
 
   setActivation(id, isActive) {
