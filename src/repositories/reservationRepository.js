@@ -46,6 +46,14 @@ return await Reservation.findById(id);
    }
 
 
+   async enregistrerSortie(id, dateReelleSortie) {
+    return await Reservation.findByIdAndUpdate(
+        id,
+        { dateReelleSortie: dateReelleSortie || new Date(), statut: 'EN_COURS' },
+        { new: true, runValidators: true }
+    );
+   }
+
    async enregistrerRetour(id, { dateReelleRetour, date, etatRetour, statut, status }) {
     const dateToSave = dateReelleRetour || date || new Date();
     const statutToSave = statut || status || 'DISPONIBLE';
