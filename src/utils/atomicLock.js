@@ -32,12 +32,13 @@ class KeyedMutex {
       }
     });
 
-    this.chains.set(k, tail.catch(() => {}));
+    const chainEntry = tail.catch(() => {});
+    this.chains.set(k, chainEntry);
 
     try {
       return await tail;
     } finally {
-      if (this.chains.get(k) === tail.catch(() => {})) {
+      if (this.chains.get(k) === chainEntry) {
         this.chains.delete(k);
       }
     }
