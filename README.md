@@ -1,4 +1,4 @@
-# ToolShare — Multi-Store Tool Reservation REST API
+# ToolShare ÔÇö Multi-Store Tool Reservation REST API
 
 [![Node.js](https://img.shields.io/badge/Node.js-v18%2B-green.svg)](https://nodejs.org/)
 [![Express.js](https://img.shields.io/badge/Express-4.21-lightgrey.svg)](https://expressjs.com/)
@@ -72,39 +72,39 @@ An industrial manufacturing plant in Safi operates multiple specialized tool sto
 ToolShare strictly adheres to the **Layered Architectural Pattern**:
 
 ```
-             ┌────────────────────────┐
-             │     Client Request     │
-             └───────────┬────────────┘
-                         │
-                         ▼
-             ┌────────────────────────┐
-             │   Routes & Middlewares │  (JWT Auth, RBAC, Store-Scope)
-             └───────────┬────────────┘
-                         │
-                         ▼
-             ┌────────────────────────┐
-             │       Controllers      │  (HTTP Parsing, Status Codes, Next)
-             └───────────┬────────────┘
-                         │
-                         ▼
-             ┌────────────────────────┐
-             │        Services        │  (Business Rules, Date Arithmetic, Overlap Detection)
-             └───────────┬────────────┘
-                         │
-                         ▼
-             ┌────────────────────────┐
-             │  ACID Concurrency Layer│  (MongoDB Session Transactions & Atomic Locks)
-             └───────────┬────────────┘
-                         │
-                         ▼
-             ┌────────────────────────┐
-             │      Repositories      │  (Mongoose Queries, MongoDB Data Access)
-             └───────────┬────────────┘
-                         │
-                         ▼
-             ┌────────────────────────┐
-             │     MongoDB Cluster    │  (Persistent Storage)
-             └────────────────────────┘
+             ÔöîÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÉ
+             Ôöé     Client Request     Ôöé
+             ÔööÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔö¼ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÿ
+                         Ôöé
+                         Ôû╝
+             ÔöîÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÉ
+             Ôöé   Routes & Middlewares Ôöé  (JWT Auth, RBAC, Store-Scope)
+             ÔööÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔö¼ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÿ
+                         Ôöé
+                         Ôû╝
+             ÔöîÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÉ
+             Ôöé       Controllers      Ôöé  (HTTP Parsing, Status Codes, Next)
+             ÔööÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔö¼ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÿ
+                         Ôöé
+                         Ôû╝
+             ÔöîÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÉ
+             Ôöé        Services        Ôöé  (Business Rules, Date Arithmetic, Overlap Detection)
+             ÔööÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔö¼ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÿ
+                         Ôöé
+                         Ôû╝
+             ÔöîÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÉ
+             Ôöé  ACID Concurrency LayerÔöé  (MongoDB Session Transactions & Atomic Locks)
+             ÔööÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔö¼ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÿ
+                         Ôöé
+                         Ôû╝
+             ÔöîÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÉ
+             Ôöé      Repositories      Ôöé  (Mongoose Queries, MongoDB Data Access)
+             ÔööÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔö¼ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÿ
+                         Ôöé
+                         Ôû╝
+             ÔöîÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÉ
+             Ôöé     MongoDB Cluster    Ôöé  (Persistent Storage)
+             ÔööÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÿ
 ```
 
 ---
@@ -126,58 +126,58 @@ ToolShare strictly adheres to the **Layered Architectural Pattern**:
 
 ```bash
 ToolShare/
-├── .env.example                     # Sample environment configuration
-├── compose.yaml                     # Docker Compose multi-container setup
-├── Dockerfile                       # Production-grade Node.js container image
-├── package.json                     # Project dependencies and test scripts
-├── README.md                        # Project documentation
-├── src/
-│   ├── app.js                       # Express app configuration & middleware pipeline
-│   ├── server.js                    # Server entry point & graceful shutdown
-│   ├── config/
-│   │   ├── db.js                    # Mongoose database connection
-│   │   └── env.js                   # Environment variable loader
-│   ├── controllers/
-│   │   ├── authController.js        # Authentication endpoints
-│   │   ├── installationController.js# Initial setup endpoints
-│   │   ├── magasinController.js     # Store management endpoints
-│   │   ├── profileController.js     # User profile endpoints
-│   │   ├── reservationController.js # Reservation, return & loan endpoints
-│   │   └── userController.js        # User management endpoints
-│   ├── docs/
-│   │   └── swagger.json             # Comprehensive OpenAPI 3.0 specification
-│   ├── middlewares/
-│   │   ├── authMiddleware.js        # JWT token extraction & verification
-│   │   ├── errorHandler.js          # Centralized HTTP error handler
-│   │   ├── roleMiddleware.js        # RBAC role access validator
-│   │   └── storeScopeMiddleware.js  # Store isolation validator for managers
-│   ├── models/
-│   │   ├── AppConfig.js             # Installation state flag
-│   │   ├── Magasin.js               # Store entity model
-│   │   ├── Materiel.js              # Equipment & tool entity model
-│   │   ├── Reservation.js           # Reservation & loan entity model
-│   │   └── User.js                  # User account model
-│   ├── repositories/
-│   │   ├── magasinRepository.js     # Store data access queries
-│   │   ├── materielRepository.js    # Material data access queries
-│   │   ├── reservationRepository.js # Reservation data access & overlapping queries
-│   │   └── userRepository.js        # User data access queries
-│   ├── routes/
-│   │   ├── authRoutes.js            # /api/auth routes
-│   │   ├── index.js                 # Central API route aggregator
-│   │   ├── installationRoutes.js    # /api/installation routes
-│   │   ├── magasinRoutes.js         # /api/magasin routes
-│   │   ├── profileRoutes.js         # /api/users/me routes
-│   │   ├── reservationRoutes.js     # /api/reservations routes
-│   │   └── userRoutes.js            # /api/users routes
-│   ├── services/
-│   │   ├── instalationService.js    # Installation orchestration & rollback
-│   │   ├── magasinService.js        # Store business logic
-│   │   ├── reservationService.js    # Overlap detection, tool checks, returns & concurrency
-│   │   └── userService.js           # User account logic & privilege escalation guard
-│   └── utils/
-│       └── jwtConfig.js             # JWT secret resolution
-└── tests/                           # Unit, integration & concurrency test suites
+Ôö£ÔöÇÔöÇ .env.example                     # Sample environment configuration
+Ôö£ÔöÇÔöÇ compose.yaml                     # Docker Compose multi-container setup
+Ôö£ÔöÇÔöÇ Dockerfile                       # Production-grade Node.js container image
+Ôö£ÔöÇÔöÇ package.json                     # Project dependencies and test scripts
+Ôö£ÔöÇÔöÇ README.md                        # Project documentation
+Ôö£ÔöÇÔöÇ src/
+Ôöé   Ôö£ÔöÇÔöÇ app.js                       # Express app configuration & middleware pipeline
+Ôöé   Ôö£ÔöÇÔöÇ server.js                    # Server entry point & graceful shutdown
+Ôöé   Ôö£ÔöÇÔöÇ config/
+Ôöé   Ôöé   Ôö£ÔöÇÔöÇ db.js                    # Mongoose database connection
+Ôöé   Ôöé   ÔööÔöÇÔöÇ env.js                   # Environment variable loader
+Ôöé   Ôö£ÔöÇÔöÇ controllers/
+Ôöé   Ôöé   Ôö£ÔöÇÔöÇ authController.js        # Authentication endpoints
+Ôöé   Ôöé   Ôö£ÔöÇÔöÇ installationController.js# Initial setup endpoints
+Ôöé   Ôöé   Ôö£ÔöÇÔöÇ magasinController.js     # Store management endpoints
+Ôöé   Ôöé   Ôö£ÔöÇÔöÇ profileController.js     # User profile endpoints
+Ôöé   Ôöé   Ôö£ÔöÇÔöÇ reservationController.js # Reservation, return & loan endpoints
+Ôöé   Ôöé   ÔööÔöÇÔöÇ userController.js        # User management endpoints
+Ôöé   Ôö£ÔöÇÔöÇ docs/
+Ôöé   Ôöé   ÔööÔöÇÔöÇ swagger.json             # Comprehensive OpenAPI 3.0 specification
+Ôöé   Ôö£ÔöÇÔöÇ middlewares/
+Ôöé   Ôöé   Ôö£ÔöÇÔöÇ authMiddleware.js        # JWT token extraction & verification
+Ôöé   Ôöé   Ôö£ÔöÇÔöÇ errorHandler.js          # Centralized HTTP error handler
+Ôöé   Ôöé   Ôö£ÔöÇÔöÇ roleMiddleware.js        # RBAC role access validator
+Ôöé   Ôöé   ÔööÔöÇÔöÇ storeScopeMiddleware.js  # Store isolation validator for managers
+Ôöé   Ôö£ÔöÇÔöÇ models/
+Ôöé   Ôöé   Ôö£ÔöÇÔöÇ AppConfig.js             # Installation state flag
+Ôöé   Ôöé   Ôö£ÔöÇÔöÇ Magasin.js               # Store entity model
+Ôöé   Ôöé   Ôö£ÔöÇÔöÇ Materiel.js              # Equipment & tool entity model
+Ôöé   Ôöé   Ôö£ÔöÇÔöÇ Reservation.js           # Reservation & loan entity model
+Ôöé   Ôöé   ÔööÔöÇÔöÇ User.js                  # User account model
+Ôöé   Ôö£ÔöÇÔöÇ repositories/
+Ôöé   Ôöé   Ôö£ÔöÇÔöÇ magasinRepository.js     # Store data access queries
+Ôöé   Ôöé   Ôö£ÔöÇÔöÇ materielRepository.js    # Material data access queries
+Ôöé   Ôöé   Ôö£ÔöÇÔöÇ reservationRepository.js # Reservation data access & overlapping queries
+Ôöé   Ôöé   ÔööÔöÇÔöÇ userRepository.js        # User data access queries
+Ôöé   Ôö£ÔöÇÔöÇ routes/
+Ôöé   Ôöé   Ôö£ÔöÇÔöÇ authRoutes.js            # /api/auth routes
+Ôöé   Ôöé   Ôö£ÔöÇÔöÇ index.js                 # Central API route aggregator
+Ôöé   Ôöé   Ôö£ÔöÇÔöÇ installationRoutes.js    # /api/installation routes
+Ôöé   Ôöé   Ôö£ÔöÇÔöÇ magasinRoutes.js         # /api/magasin routes
+Ôöé   Ôöé   Ôö£ÔöÇÔöÇ profileRoutes.js         # /api/users/me routes
+Ôöé   Ôöé   Ôö£ÔöÇÔöÇ reservationRoutes.js     # /api/reservations routes
+Ôöé   Ôöé   ÔööÔöÇÔöÇ userRoutes.js            # /api/users routes
+Ôöé   Ôö£ÔöÇÔöÇ services/
+Ôöé   Ôöé   Ôö£ÔöÇÔöÇ instalationService.js    # Installation orchestration & rollback
+Ôöé   Ôöé   Ôö£ÔöÇÔöÇ magasinService.js        # Store business logic
+Ôöé   Ôöé   Ôö£ÔöÇÔöÇ reservationService.js    # Overlap detection, tool checks, returns & concurrency
+Ôöé   Ôöé   ÔööÔöÇÔöÇ userService.js           # User account logic & privilege escalation guard
+Ôöé   ÔööÔöÇÔöÇ utils/
+Ôöé       ÔööÔöÇÔöÇ jwtConfig.js             # JWT secret resolution
+ÔööÔöÇÔöÇ tests/                           # Unit, integration & concurrency test suites
 ```
 
 ---
@@ -279,7 +279,7 @@ ToolShare enforces a zero-configuration default state until initialized via the 
    ```json
    {
      "success": true,
-     "message": "Application installée avec succès.",
+     "message": "Application install├®e avec succ├¿s.",
      "data": {
        "user": {
          "id": "60d0fe4f5311236168a109ca",
@@ -301,12 +301,12 @@ ToolShare enforces a zero-configuration default state until initialized via the 
 ToolShare embeds an interactive OpenAPI 3.0 documentation explorer.
 
 Once the server is running, navigate to:
-👉 **[http://localhost:3000/api/docs](http://localhost:3000/api/docs)**
+­ƒæë **[http://localhost:3000/api/docs](http://localhost:3000/api/docs)**
 
 ### Testing Authenticated Routes in Swagger:
 1. Call `POST /api/auth/login` with your credentials.
 2. Copy the returned `token`.
-3. Click the **Authorize 🔓** button at the top right of the Swagger UI.
+3. Click the **Authorize ­ƒöô** button at the top right of the Swagger UI.
 4. Paste the token into the field and click **Authorize**.
 5. All protected endpoints can now be executed directly within the browser!
 
@@ -345,17 +345,17 @@ Once the server is running, navigate to:
 
 | Capability | Admin | Gestionnaire | Utilisateur |
 | :--- | :---: | :---: | :---: |
-| Authenticate & update personal profile | ✅ | ✅ | ✅ |
-| View active stores and tool availability | ✅ | ✅ | ✅ |
-| Reserve tools across any active store | ✅ | ✅ | ✅ |
-| View & cancel personal reservations | ✅ | ✅ | ✅ |
-| Create store manager accounts | ✅ | ❌ | ❌ |
-| Create regular user accounts | ✅ | ✅ *(Store-scoped)* | ❌ |
-| Manage stores (CRUD, activation) | ✅ | ❌ | ❌ |
-| Assign manager to a store | ✅ | ❌ | ❌ |
-| Filter & view store reservations | ✅ *(All)* | ✅ *(Assigned store)* | ❌ |
-| Process returns & record equipment condition | ✅ | ✅ *(Assigned store)* | ❌ |
-| Monitor overdue borrowings & loan logs | ✅ *(All)* | ✅ *(Assigned store)* | ✅ *(Personal)* |
+| Authenticate & update personal profile | Ô£à | Ô£à | Ô£à |
+| View active stores and tool availability | Ô£à | Ô£à | Ô£à |
+| Reserve tools across any active store | Ô£à | Ô£à | Ô£à |
+| View & cancel personal reservations | Ô£à | Ô£à | Ô£à |
+| Create store manager accounts | Ô£à | ÔØî | ÔØî |
+| Create regular user accounts | Ô£à | Ô£à *(Store-scoped)* | ÔØî |
+| Manage stores (CRUD, activation) | Ô£à | ÔØî | ÔØî |
+| Assign manager to a store | Ô£à | ÔØî | ÔØî |
+| Filter & view store reservations | Ô£à *(All)* | Ô£à *(Assigned store)* | ÔØî |
+| Process returns & record equipment condition | Ô£à | Ô£à *(Assigned store)* | ÔØî |
+| Monitor overdue borrowings & loan logs | Ô£à *(All)* | Ô£à *(Assigned store)* | Ô£à *(Personal)* |
 
 ---
 
@@ -405,14 +405,14 @@ npm test
 
 *Expected output:*
 ```bash
-ℹ tests 95
-ℹ suites 4
-ℹ pass 94
-ℹ fail 0
-ℹ cancelled 0
-ℹ skipped 1
-ℹ todo 0
-ℹ duration_ms 5040.8727
+Ôä╣ tests 95
+Ôä╣ suites 4
+Ôä╣ pass 94
+Ôä╣ fail 0
+Ôä╣ cancelled 0
+Ôä╣ skipped 1
+Ôä╣ todo 0
+Ôä╣ duration_ms 5040.8727
 ```
 
 ---
@@ -439,6 +439,46 @@ The project follows a standard feature-branch workflow integrated with Jira issu
 - `TOOL-118 #done feat(borrowing): implement overdue borrowings detection endpoint`
 - `TOOL-127 #done feat(docs): setup Swagger UI OpenAPI 3.0 at /api/docs`
 - `TOOL-128 #done docs: add comprehensive professional README in English`
+
+
+---
+
+## Material Reference Uniqueness Rollout
+
+### Implemented API Behavior
+
+The material API derives eferenceKey on the server from the material reference after trimming whitespace and converting it to lowercase. Clients cannot provide or update eferenceKey directly. The service checks for an existing normalized key and returns a conflict when one is found.
+
+### Pending Database Deployment
+
+The Materiel schema declares a unique index on eferenceKey, but utoIndex: false disables automatic index creation. The actual MongoDB index has not yet been verified, so the schema declaration does not establish that the index exists in any deployed database.
+
+Before backfilling existing materials, run the read-only reference audit and review its findings. Resolve missing, null, blank, or non-string references and duplicate normalized references manually. Missing or inconsistent eferenceKey values are repairable only when their stored reference is valid and unique after normalization. Rerun the complete audit after backfill and require zero findings before explicitly creating and verifying the unique eferenceKey index in the target database.
+
+Until this rollout is complete, service-level duplicate checks are not race-safe: concurrent requests can pass the check before either write completes. The checks can also miss legacy material documents that do not yet have a eferenceKey. Do not rely on the API check alone to guarantee uniqueness in a shared database.
+
+### Controlled Rollout Commands
+
+The rollout tool never loads .env; provide MONGO_URI in the process environment. Dry-run is read-only:
+
+`sh
+npm run material-reference:dry-run
+`
+
+Before either database-changing command, pause material writes and verify the target database with the database owner. The confirmation must exactly match the database name in MONGO_URI:
+
+`sh
+npm run material-reference:backfill -- --confirm-db=<database-name>
+npm run material-reference:create-index -- --confirm-db=<database-name>
+`
+
+Backfill refuses to write if any reference is missing, blank, non-string, or duplicated after trimming and lowercasing. Resolve those records manually under an approved data plan; this tool never renames or deletes materials. Missing or inconsistent eferenceKey values are repairable only when their stored reference is valid and unique. Backfill updates only eferenceKey, with filters guarding the audited _id, original eference, and prior key state. It then runs the full audit again and reports failure if any finding remains.
+
+Run the index command only after backfill reports a clean full audit. It independently audits again, refuses all findings, preserves other indexes, explicitly creates the global { referenceKey: 1 } unique index, and verifies the physical index definition and unique: true. A partial/non-unique existing eferenceKey index blocks automatic replacement and requires manual review. A successful command is the only indication that this deployment step was verified; the schema declaration alone is not.
+
+These commands are database operations. Their confirmation protects against an accidental URI/database mismatch, but does not determine whether a database is safe or authorized to change. Do not run them against production until the owner approves the maintenance window, audit findings are resolved, and writes are paused through index verification. If backfill partially fails, stop, note the reported count of acknowledged/confirmed guarded updates (which may be lower than the number actually applied if an acknowledgement was lost), run the read-only audit again, and review remaining findings before retrying. The tool does not roll back key updates or drop indexes automatically; original eference values and all material documents are preserved.
+
+The integration test uses a random temporary collection in the local 	oolshare_test database and refuses other hosts or database names. It creates and drops only that test-created collection. Set MONGO_TEST_URI and MONGO_TEST_DATABASE_CONFIRMATION=toolshare_test to authorize the test database writes; without MONGO_TEST_URI the test is skipped.
 
 ---
 

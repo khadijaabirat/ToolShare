@@ -6,7 +6,10 @@
   "scripts": {
     "start": "node src/server.js",
     "dev": "nodemon src/server.js",
-    "test": "node --test"
+    "test": "node --test",
+    "material-reference:dry-run": "node scripts/rolloutMaterialReferenceIndex.js --run --dry-run",
+    "material-reference:backfill": "node scripts/rolloutMaterialReferenceIndex.js --run --backfill",
+    "material-reference:create-index": "node scripts/rolloutMaterialReferenceIndex.js --run --create-index"
   },
   "keywords": [
     "express",
