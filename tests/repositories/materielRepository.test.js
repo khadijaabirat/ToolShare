@@ -69,3 +69,72 @@ test('activation updates only isActive and does not alter maintenance state', as
   });
   assert.equal(result.statut, 'INDISPONIBLE');
 });
+
+test('findMaterielById aliases findById', async (t) => {
+  const dummy = { _id: '507f1f77bcf86cd799439011', nom: 'Perceuse' };
+  replaceMethod(t, Materiel, 'findById', (id) => Promise.resolve(id === dummy._id ? dummy : null));
+
+  const direct = await materielRepository.findById('507f1f77bcf86cd799439011');
+  const alias = await materielRepository.findMaterielById('507f1f77bcf86cd799439011');
+  assert.equal(direct, dummy);
+  assert.equal(alias, dummy);
+});
+
+test('updateFields accepts string status payload for reservation return compatibility', async (t) => {
+  let captured;
+  replaceMethod(t, Materiel, 'findByIdAndUpdate', (id, update, options) => {
+    captured = { id, update, options };
+    return {
+      catch: (fn) => Promise.resolve({ _id: id, statut: update.$set.statut }),
+    };
+  });
+
+  const res1 = await materielRepository.updateFields('507f1f77bcf86cd799439011', 'DISPONIBLE');
+  assert.deepEqual(captured, {
+    id: '507f1f77bcf86cd799439011',
+    update: { $set: { statut: 'DISPONIBLE' } },
+    options: { new: true, runValidators: true },
+  });
+  assert.equal(res1.statut, 'DISPONIBLE');
+
+  const res2 = await materielRepository.UpdateMateriel('507f1f77bcf86cd799439011', 'INDISPONIBLE');
+  assert.deepEqual(captured, {
+    id: '507f1f77bcf86cd799439011',
+    update: { $set: { statut: 'INDISPONIBLE' } },
+    options: { new: true, runValidators: true },
+  });
+  assert.equal(res2.statut, 'INDISPONIBLE');
+});
+
+test('findByReferenceKey queries referenceKey and supports excludeId', async (t) => {
+  let capturedFilter;
+  let selected;
+  replaceMethod(t, Materiel, 'findOne', (filter) => {
+    capturedFilter = filter;
+    return {
+      select: (fields) => {
+        selected = fields;
+        return Promise.resolve({ _id: '507f1f77bcf86cd799439099' });
+      },
+    };
+  });
+
+  await materielRepository.findByReferenceKey('perceuse-01', '507f1f77bcf86cd799439011');
+  assert.deepEqual(capturedFilter, {
+    referenceKey: 'perceuse-01',
+    _id: { $ne: '507f1f77bcf86cd799439011' },
+  });
+  assert.equal(selected, '_id');
+});
+
+test('findMany delegates to Materiel.find with filter', async (t) => {
+  let capturedFilter;
+  replaceMethod(t, Materiel, 'find', (filter) => {
+    capturedFilter = filter;
+    return Promise.resolve([{ _id: '507f1f77bcf86cd799439011' }]);
+  });
+
+  const res = await materielRepository.findMany({ isActive: true, magasinId: '507f1f77bcf86cd799439012' });
+  assert.deepEqual(capturedFilter, { isActive: true, magasinId: '507f1f77bcf86cd799439012' });
+  assert.equal(res.length, 1);
+});
