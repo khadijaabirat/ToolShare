@@ -63,6 +63,32 @@ async function setActivation(req, res, next) {
   }
 }
 
+async function updateStatut(req, res, next) {
+  try {
+    const body = req.body;
+    if (!body || typeof body !== 'object' || Array.isArray(body) ||
+        Object.keys(body).length !== 1 ||
+        !Object.prototype.hasOwnProperty.call(body, 'statut')) {
+      const error = new Error('Le champ statut est obligatoire et constitue le seul champ autorisé.');
+      error.statusCode = 400;
+      throw error;
+    }
+
+    const material = await materielService.changerStatutMateriel(
+      req.material,
+      req.user,
+      body.statut
+    );
+    return res.status(200).json({
+      success: true,
+      message: 'Statut du matériel mis à jour avec succès',
+      data: material,
+    });
+  } catch (error) {
+    return next(error);
+  }
+}
+
 async function deactivateMaterial(req, res, next) {
   try {
     const material = await materielService.setActivation(req.material, false);
@@ -82,5 +108,6 @@ module.exports = {
   getMaterial,
   updateMaterial,
   setActivation,
+  updateStatut,
   deactivateMaterial,
 };

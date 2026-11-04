@@ -14,6 +14,7 @@ const scopedMaterial = [...materialManagers, loadMateriel, storeScopeMiddleware]
 router.post('/', ...materialManagers, materielController.createMaterial);
 router.get('/', ...materialManagers, materielController.listMaterials);
 router.patch('/:id/activation', ...scopedMaterial, materielController.setActivation);
+router.patch('/:id/status', ...scopedMaterial, materielController.updateStatut);
 router.get('/:id', ...scopedMaterial, materielController.getMaterial);
 router.put('/:id', ...scopedMaterial, materielController.updateMaterial);
 router.delete('/:id', ...scopedMaterial, materielController.deactivateMaterial);

@@ -98,6 +98,7 @@ describe('material management routes', () => {
       create: repo.create,
       updateFields: repo.updateFields,
       setActivation: repo.setActivation,
+      updateMaterielStatut: repo.updateMaterielStatut,
       findMagasinById: magasinRepo.findMagasinById,
     };
 
@@ -151,6 +152,12 @@ describe('material management routes', () => {
       material.isActive = isActive;
       return material;
     };
+    repo.updateMaterielStatut = async (id, statut) => {
+      const material = materials.get(String(id));
+      if (!material) return null;
+      material.statut = statut;
+      return material;
+    };
 
     app = require('../../src/app');
     await new Promise((resolve, reject) => {
@@ -196,6 +203,7 @@ describe('material management routes', () => {
       create: originals.create,
       updateFields: originals.updateFields,
       setActivation: originals.setActivation,
+      updateMaterielStatut: originals.updateMaterielStatut,
     });
     if (originalJwtSecret === undefined) delete process.env.JWT_SECRET;
     else process.env.JWT_SECRET = originalJwtSecret;
@@ -362,6 +370,45 @@ describe('material management routes', () => {
     assert.equal(result.json.data.isActive, false);
     assert.equal(result.json.data.statut, 'INDISPONIBLE');
     assert.equal(materials.has(MATERIAL_B), true);
+  });
+
+
+  test('TOOL-98 allows Admin and same-store Gestionnaire to change material status', async () => {
+    const unavailable = await request(`/api/materials/${MATERIAL_A}/status`, 'PATCH',
+      { statut: 'INDISPONIBLE' }, tokenFor(MANAGER_A_ID));
+    assert.equal(unavailable.status, 200);
+    assert.equal(unavailable.json.success, true);
+    assert.equal(unavailable.json.message, 'Statut du matériel mis à jour avec succès');
+    assert.equal(unavailable.json.data.statut, 'INDISPONIBLE');
+
+    const available = await request(`/api/materials/${MATERIAL_A}/status`, 'PATCH',
+      { statut: 'DISPONIBLE' }, tokenFor(ADMIN_ID));
+    assert.equal(available.status, 200);
+    assert.equal(available.json.data.statut, 'DISPONIBLE');
+  });
+
+  test('TOOL-98 validates status payload and rejects inactive materials', async () => {
+    const token = tokenFor(ADMIN_ID);
+    for (const body of [undefined, {}, { statut: '' }, { statut: 'EN_MAINTENANCE' },
+      { statut: 'INDISPONIBLE', isActive: true }, null]) {
+      assertError(await request(`/api/materials/${MATERIAL_A}/status`, 'PATCH', body, token), 400);
+    }
+    assertError(await request(`/api/materials/${MATERIAL_B}/status`, 'PATCH',
+      { statut: 'DISPONIBLE' }, token), 400);
+    assert.equal(materials.get(MATERIAL_A).statut, 'DISPONIBLE');
+  });
+
+  test('TOOL-98 enforces authentication, roles, store ownership and material existence', async () => {
+    assertError(await request(`/api/materials/${MATERIAL_A}/status`, 'PATCH',
+      { statut: 'INDISPONIBLE' }), 401);
+    assertError(await request(`/api/materials/${MATERIAL_A}/status`, 'PATCH',
+      { statut: 'INDISPONIBLE' }, tokenFor(USER_ID)), 403);
+    assertError(await request(`/api/materials/${MATERIAL_B}/status`, 'PATCH',
+      { statut: 'DISPONIBLE' }, tokenFor(MANAGER_A_ID)), 403);
+    assertError(await request('/api/materials/not-an-id/status', 'PATCH',
+      { statut: 'INDISPONIBLE' }, tokenFor(ADMIN_ID)), 400);
+    assertError(await request('/api/materials/507f1f77bcf86cd799439099/status', 'PATCH',
+      { statut: 'INDISPONIBLE' }, tokenFor(ADMIN_ID)), 404);
   });
 
   test('maps a repository duplicate-key race to HTTP 409', async () => {
