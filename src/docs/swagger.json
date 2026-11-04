@@ -522,6 +522,19 @@
           "404": { "description": "RÃ©servation introuvable" }
         }
       }
+    },
+    "/api/borrowings/overdue": {
+      "get": {
+        "tags": ["Emprunts & Retours"],
+        "summary": "Suivi des emprunts en retard (TOOL-52, TOOL-53)",
+        "description": "Retourne la liste des emprunts (statut EN_COURS) dont la date de fin prevue est depassee. Le gestionnaire accede uniquement a son magasin.",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": { "description": "Liste des emprunts en retard avec calcul du retard" },
+          "401": { "description": "Non authentifie" },
+          "403": { "description": "Acces interdit (role non autorise ou gestionnaire non affecte a un magasin)" }
+        }
+      }
     }
   }
 }

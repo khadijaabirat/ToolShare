@@ -10,6 +10,7 @@ const profileRoutes = require('./profileRoutes');
 const userRoutes = require('./userRoutes');
 const materielRoutes = require('./materielRoutes');
 const reservationRoutes = require('./reservationRoutes');
+const borrowingRoutes = require('./borrowingRoutes');
 
 router.use('/installation', installationRoutes);
 router.use('/magasin', magasinRoutes);
@@ -18,5 +19,6 @@ router.use('/users', profileRoutes);
 router.use('/users', userRoutes);
 router.use('/materials', materielRoutes);
 router.use('/reservations', reservationRoutes);
+router.use('/borrowings', borrowingRoutes);
 
 module.exports = router;
