@@ -71,5 +71,16 @@ return await Reservation.findById(id);
 
 
 
+   async findOverdueBorrowings(query = {}) {
+    const filter = {
+        ...query,
+        statut: 'EN_COURS',
+        dateFin: { $lt: new Date() }
+    };
+    return await Reservation.find(filter)
+        .populate('materielId', 'nom reference description')
+        .populate('userId', 'nom prenom email')
+        .populate('magasinId', 'nom adresse site');
+   }
 }
 module.exports=new reservationRepository();

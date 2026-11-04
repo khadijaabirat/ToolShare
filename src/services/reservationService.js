@@ -175,5 +175,38 @@ async enregistrerRetour(reservationId,user,etatRetour){
             statut: status
         });
 }
+
+async getOverdueBorrowings(user, filter = {}) {
+    const now = new Date();
+    const query = {
+        ...filter,
+        statut: 'EN_COURS',
+        dateFin: { $lt: now }
+    };
+    if (user.role === 'Gestionnaire') {
+        if (!user.magasinId) {
+            const err = new Error('Magasin non assigne au gestionnaire');
+            err.statusCode = 403;
+            throw err;
+        }
+        query.magasinId = user.magasinId;
+    }
+    const overdueList = await reservationRepository.findOverdueBorrowings(query);
+
+    return overdueList.map(item => {
+        const doc = item.toObject ? item.toObject() : { ...item };
+        const dateFin = new Date(doc.dateFin);
+        const diffMs = Math.max(0, now.getTime() - dateFin.getTime());
+        const retardMinutes = Math.floor(diffMs / (1000 * 60));
+        const retardHeures = Math.floor(diffMs / (1000 * 60 * 60));
+        return {
+            ...doc,
+            enRetard: true,
+            isOverdue: true,
+            retardMinutes,
+            retardHeures
+        };
+    });
+}
 }
 module.exports=new reservationService();
