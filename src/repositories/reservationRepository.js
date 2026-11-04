@@ -1,17 +1,24 @@
 const Reservation= require('../models/Reservation');
  const materielRepository = require('./materielRepository');
 class reservationRepository{
-    async findOverlappingReservation(materielId, ndateDebut, ndateFin) {
-        return await Reservation.findOne({
+    async findOverlappingReservation(materielId, ndateDebut, ndateFin, session = null) {
+        const query = {
             materielId: materielId,
             statut: { $in: ['CONFIRMEE', 'EN_COURS'] },
             dateDebut: { $lt: ndateFin },
             dateFin: { $gt: ndateDebut }
-        });
+        };
+        const req = Reservation.findOne(query);
+        if (session) req.session(session);
+        return await req;
     }
 
 
-    async createReservation(data){
+    async createReservation(data, session = null) {
+        if (session) {
+            const [created] = await Reservation.create([data], { session });
+            return created;
+        }
         return await Reservation.create(data);
     }
 
