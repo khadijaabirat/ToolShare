@@ -112,6 +112,33 @@ async getreservationsWithFilter(user,filter){
   }
 }
 
+async enregistrerSortie(reservationId, user) {
+    const reservation = await reservationRepository.getReservation(reservationId);
+    if (!reservation) {
+        const err = new Error('la reservation introuvable');
+        err.statusCode = 404;
+        throw err;
+    }
+    if (user.role === 'Gestionnaire') {
+        if (!user.magasinId || user.magasinId.toString() !== reservation.magasinId?.toString()) {
+            const err = new Error('impossible de modifier cette reservation ');
+            err.statusCode = 403;
+            throw err;
+        }
+    }
+    if (reservation.statut !== 'CONFIRMEE') {
+        const err = new Error('seules les reservations confirmees peuvent etre remises');
+        err.statusCode = 400;
+        throw err;
+    }
+    if (reservation.dateReelleSortie) {
+        const err = new Error('le materiel est deja sorti');
+        err.statusCode = 400;
+        throw err;
+    }
+    return await reservationRepository.enregistrerSortie(reservationId, new Date());
+}
+
 async enregistrerRetour(reservationId,user,etatRetour){
      if(!etatRetour){
         const err = new Error('etat obligatoire');

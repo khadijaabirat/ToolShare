@@ -75,6 +75,21 @@ res.status(200).json({
 }
 
 
+async function enregistrerSortie(req, res, next) {
+    try {
+        const id = req.params.id;
+        const user = req.user;
+        const reservation = await reservationService.enregistrerSortie(id, user);
+        return res.status(200).json({
+            success: true,
+            message: 'la remise du materiel enregistree avec succes',
+            data: reservation,
+        });
+    } catch (error) {
+        next(error);
+    }
+}
+
 async function enregistrerRetour(req, res, next){
 try{
     const id = req.params.id;
@@ -94,5 +109,5 @@ next(error);
 }
 }
 module.exports={
-    Create, getMyReservations,annulerReservation,getReservations,enregistrerRetour
+    Create, getMyReservations,annulerReservation,getReservations,enregistrerSortie,enregistrerRetour
 }

@@ -8,5 +8,6 @@ router.post('/',authMiddleware,reservationController.Create);
 router.get('/my',authMiddleware,reservationController.getMyReservations);
 router.delete('/:id',authMiddleware,reservationController.annulerReservation);
 router.get('/',authMiddleware,roleMiddleware('Admin','Gestionnaire'),reservationController.getReservations);
+router.post('/:id/handover',authMiddleware,roleMiddleware('Admin','Gestionnaire'),reservationController.enregistrerSortie);
 router.post('/:id/return',authMiddleware,roleMiddleware('Admin','Gestionnaire'),reservationController.enregistrerRetour);
 module.exports= router; 
