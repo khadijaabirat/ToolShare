@@ -43,6 +43,10 @@
     {
       "name": "Emprunts & Retours",
       "description": "Suivi des mouvements, restitution physique et constat d'Ã©tat"
+    },
+    {
+      "name": "Matériels",
+      "description": "Gestion de l'inventaire matériel, unicité de référence, périmètre magasin et statuts de disponibilité"
     }
   ],
   "components": {
@@ -66,77 +70,198 @@
       },
       "InstallationInput": {
         "type": "object",
-        "required": ["nom", "prenom", "email", "password"],
+        "required": [
+          "nom",
+          "prenom",
+          "email",
+          "password"
+        ],
         "properties": {
-          "nom": { "type": "string", "example": "Abirat" },
-          "prenom": { "type": "string", "example": "Khadija" },
-          "email": { "type": "string", "format": "email", "example": "admin@toolshare.ma" },
-          "password": { "type": "string", "format": "password", "example": "SuperSecret123!" }
+          "nom": {
+            "type": "string",
+            "example": "Abirat"
+          },
+          "prenom": {
+            "type": "string",
+            "example": "Khadija"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "example": "admin@toolshare.ma"
+          },
+          "password": {
+            "type": "string",
+            "format": "password",
+            "example": "SuperSecret123!"
+          }
         }
       },
       "LoginInput": {
         "type": "object",
-        "required": ["email", "password"],
+        "required": [
+          "email",
+          "password"
+        ],
         "properties": {
-          "email": { "type": "string", "format": "email", "example": "admin@toolshare.ma" },
-          "password": { "type": "string", "format": "password", "example": "SuperSecret123!" }
+          "email": {
+            "type": "string",
+            "format": "email",
+            "example": "admin@toolshare.ma"
+          },
+          "password": {
+            "type": "string",
+            "format": "password",
+            "example": "SuperSecret123!"
+          }
         }
       },
       "LoginResponse": {
         "type": "object",
         "properties": {
-          "token": { "type": "string", "example": "eyJhbGciOiJIUzI1NiIsIn..." },
+          "token": {
+            "type": "string",
+            "example": "eyJhbGciOiJIUzI1NiIsIn..."
+          },
           "user": {
             "type": "object",
             "properties": {
-              "id": { "type": "string", "example": "60d0fe4f5311236168a109ca" },
-              "nom": { "type": "string", "example": "Abirat" },
-              "prenom": { "type": "string", "example": "Khadija" },
-              "email": { "type": "string", "example": "admin@toolshare.ma" },
-              "role": { "type": "string", "example": "Admin" },
-              "magasinId": { "type": "string", "nullable": true, "example": null }
+              "id": {
+                "type": "string",
+                "example": "60d0fe4f5311236168a109ca"
+              },
+              "nom": {
+                "type": "string",
+                "example": "Abirat"
+              },
+              "prenom": {
+                "type": "string",
+                "example": "Khadija"
+              },
+              "email": {
+                "type": "string",
+                "example": "admin@toolshare.ma"
+              },
+              "role": {
+                "type": "string",
+                "example": "Admin"
+              },
+              "magasinId": {
+                "type": "string",
+                "nullable": true,
+                "example": null
+              }
             }
           }
         }
       },
       "UserInput": {
         "type": "object",
-        "required": ["nom", "prenom", "email", "password", "role"],
+        "required": [
+          "nom",
+          "prenom",
+          "email",
+          "password",
+          "role"
+        ],
         "properties": {
-          "nom": { "type": "string", "example": "Benali" },
-          "prenom": { "type": "string", "example": "Karim" },
-          "email": { "type": "string", "format": "email", "example": "k.benali@toolshare.ma" },
-          "password": { "type": "string", "format": "password", "example": "Password123!" },
-          "role": { "type": "string", "enum": ["Admin", "Gestionnaire", "Utilisateur"], "example": "Utilisateur" },
-          "magasinId": { "type": "string", "description": "Obligatoire si le rÃ´le est Gestionnaire", "example": "60d0fe4f5311236168a109cb" }
+          "nom": {
+            "type": "string",
+            "example": "Benali"
+          },
+          "prenom": {
+            "type": "string",
+            "example": "Karim"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "example": "k.benali@toolshare.ma"
+          },
+          "password": {
+            "type": "string",
+            "format": "password",
+            "example": "Password123!"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "Admin",
+              "Gestionnaire",
+              "Utilisateur"
+            ],
+            "example": "Utilisateur"
+          },
+          "magasinId": {
+            "type": "string",
+            "description": "Obligatoire si le rÃ´le est Gestionnaire",
+            "example": "60d0fe4f5311236168a109cb"
+          }
         }
       },
       "MagasinInput": {
         "type": "object",
-        "required": ["nom", "adresse", "site"],
+        "required": [
+          "nom",
+          "adresse",
+          "site"
+        ],
         "properties": {
-          "nom": { "type": "string", "example": "Magasin Central Safi" },
-          "adresse": { "type": "string", "example": "Zone Industrielle OCP, Safi" },
-          "site": { "type": "string", "example": "Safi Nord" }
+          "nom": {
+            "type": "string",
+            "example": "Magasin Central Safi"
+          },
+          "adresse": {
+            "type": "string",
+            "example": "Zone Industrielle OCP, Safi"
+          },
+          "site": {
+            "type": "string",
+            "example": "Safi Nord"
+          }
         }
       },
       "ReservationInput": {
         "type": "object",
-        "required": ["magasinId", "materielId", "dateDebut", "dureeHeures"],
+        "required": [
+          "magasinId",
+          "materielId",
+          "dateDebut",
+          "dureeHeures"
+        ],
         "properties": {
-          "magasinId": { "type": "string", "example": "60d0fe4f5311236168a109cb" },
-          "materielId": { "type": "string", "example": "60d0fe4f5311236168a109cc" },
-          "dateDebut": { "type": "string", "format": "date-time", "example": "2026-11-01T09:00:00.000Z" },
-          "dureeHeures": { "type": "integer", "minimum": 1, "example": 4 }
+          "magasinId": {
+            "type": "string",
+            "example": "60d0fe4f5311236168a109cb"
+          },
+          "materielId": {
+            "type": "string",
+            "example": "60d0fe4f5311236168a109cc"
+          },
+          "dateDebut": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2026-11-01T09:00:00.000Z"
+          },
+          "dureeHeures": {
+            "type": "integer",
+            "minimum": 1,
+            "example": 4
+          }
         }
       },
       "RetourInput": {
         "type": "object",
-        "required": ["etatRetour"],
+        "required": [
+          "etatRetour"
+        ],
         "properties": {
           "etatRetour": {
             "type": "string",
-            "enum": ["BON_ETAT", "ENDOMMAGE"],
+            "enum": [
+              "BON_ETAT",
+              "ENDOMMAGE"
+            ],
             "example": "BON_ETAT"
           }
         }
@@ -144,7 +269,72 @@
       "ErrorResponse": {
         "type": "object",
         "properties": {
-          "message": { "type": "string", "example": "Description explicite de l'erreur." }
+          "message": {
+            "type": "string",
+            "example": "Description explicite de l'erreur."
+          }
+        }
+      },
+      "MaterialInput": {
+        "type": "object",
+        "required": [
+          "reference",
+          "nom",
+          "categorie"
+        ],
+        "properties": {
+          "reference": {
+            "type": "string",
+            "example": "PERF-001",
+            "description": "Référence physique unique globale"
+          },
+          "nom": {
+            "type": "string",
+            "example": "Perforateur burineur Hilti"
+          },
+          "categorie": {
+            "type": "string",
+            "example": "Outillage électroportatif"
+          },
+          "description": {
+            "type": "string",
+            "example": "Perforateur SDS-Max 1200W"
+          },
+          "magasinId": {
+            "type": "string",
+            "example": "507f1f77bcf86cd799439011",
+            "description": "Identifiant du magasin (requis pour Admin)"
+          }
+        }
+      },
+      "MaterialStatusInput": {
+        "type": "object",
+        "required": [
+          "statut"
+        ],
+        "properties": {
+          "statut": {
+            "type": "string",
+            "enum": [
+              "DISPONIBLE",
+              "INDISPONIBLE"
+            ],
+            "example": "INDISPONIBLE",
+            "description": "Statut opérationnel du matériel"
+          }
+        }
+      },
+      "MaterialActivationInput": {
+        "type": "object",
+        "required": [
+          "isActive"
+        ],
+        "properties": {
+          "isActive": {
+            "type": "boolean",
+            "example": true,
+            "description": "État d activation logique du matériel"
+          }
         }
       }
     }
@@ -152,7 +342,9 @@
   "paths": {
     "/api/installation/status": {
       "get": {
-        "tags": ["Installation"],
+        "tags": [
+          "Installation"
+        ],
         "summary": "VÃ©rifier le statut d'installation de l'application",
         "description": "Indique si l'application a dÃ©jÃ  Ã©tÃ© configurÃ©e avec le compte Admin initial.",
         "responses": {
@@ -160,7 +352,9 @@
             "description": "Statut retournÃ© avec succÃ¨s",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/InstallationStatus" }
+                "schema": {
+                  "$ref": "#/components/schemas/InstallationStatus"
+                }
               }
             }
           }
@@ -169,35 +363,51 @@
     },
     "/api/installation": {
       "post": {
-        "tags": ["Installation"],
+        "tags": [
+          "Installation"
+        ],
         "summary": "Initialiser ToolShare et crÃ©er le premier compte Administrateur",
         "description": "OpÃ©ration atomique unique. RefusÃ©e avec 400 si l'application est dÃ©jÃ  installÃ©e.",
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
-              "schema": { "$ref": "#/components/schemas/InstallationInput" }
+              "schema": {
+                "$ref": "#/components/schemas/InstallationInput"
+              }
             }
           }
         },
         "responses": {
-          "201": { "description": "Application installÃ©e avec succÃ¨s et compte Admin crÃ©Ã©" },
+          "201": {
+            "description": "Application installÃ©e avec succÃ¨s et compte Admin crÃ©Ã©"
+          },
           "400": {
             "description": "L'application est dÃ©jÃ  installÃ©e ou donnÃ©es manquantes",
-            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           }
         }
       }
     },
     "/api/auth/login": {
       "post": {
-        "tags": ["Authentification"],
+        "tags": [
+          "Authentification"
+        ],
         "summary": "Connexion utilisateur et Ã©mission du jeton JWT",
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
-              "schema": { "$ref": "#/components/schemas/LoginInput" }
+              "schema": {
+                "$ref": "#/components/schemas/LoginInput"
+              }
             }
           }
         },
@@ -206,31 +416,55 @@
             "description": "Connexion rÃ©ussie",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/LoginResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/LoginResponse"
+                }
               }
             }
           },
           "401": {
             "description": "Identifiants invalides ou compte inactif",
-            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           }
         }
       }
     },
     "/api/users/me": {
       "get": {
-        "tags": ["Profil"],
+        "tags": [
+          "Profil"
+        ],
         "summary": "Consulter les informations du profil connectÃ©",
-        "security": [{ "bearerAuth": [] }],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "responses": {
-          "200": { "description": "Profil retournÃ© avec succÃ¨s" },
-          "401": { "description": "Non authentifiÃ©" }
+          "200": {
+            "description": "Profil retournÃ© avec succÃ¨s"
+          },
+          "401": {
+            "description": "Non authentifiÃ©"
+          }
         }
       },
       "put": {
-        "tags": ["Profil"],
+        "tags": [
+          "Profil"
+        ],
         "summary": "Mettre Ã  jour son profil et mot de passe",
-        "security": [{ "bearerAuth": [] }],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -238,165 +472,330 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "nom": { "type": "string" },
-                  "prenom": { "type": "string" },
-                  "email": { "type": "string" },
-                  "currentPassword": { "type": "string" },
-                  "newPassword": { "type": "string" }
+                  "nom": {
+                    "type": "string"
+                  },
+                  "prenom": {
+                    "type": "string"
+                  },
+                  "email": {
+                    "type": "string"
+                  },
+                  "currentPassword": {
+                    "type": "string"
+                  },
+                  "newPassword": {
+                    "type": "string"
+                  }
                 }
               }
             }
           }
         },
         "responses": {
-          "200": { "description": "Profil mis Ã  jour avec succÃ¨s" },
-          "400": { "description": "DonnÃ©es invalides ou mot de passe incorrect" },
-          "401": { "description": "Non authentifiÃ©" }
+          "200": {
+            "description": "Profil mis Ã  jour avec succÃ¨s"
+          },
+          "400": {
+            "description": "DonnÃ©es invalides ou mot de passe incorrect"
+          },
+          "401": {
+            "description": "Non authentifiÃ©"
+          }
         }
       }
     },
     "/api/users": {
       "post": {
-        "tags": ["Utilisateurs"],
+        "tags": [
+          "Utilisateurs"
+        ],
         "summary": "CrÃ©er un nouveau compte utilisateur (Admin ou Gestionnaire)",
         "description": "L'Admin peut crÃ©er tous types de rÃ´les. Le Gestionnaire ne peut crÃ©er que des Utilisateurs assignÃ©s Ã  son magasin.",
-        "security": [{ "bearerAuth": [] }],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
-              "schema": { "$ref": "#/components/schemas/UserInput" }
+              "schema": {
+                "$ref": "#/components/schemas/UserInput"
+              }
             }
           }
         },
         "responses": {
-          "201": { "description": "Compte crÃ©Ã© avec succÃ¨s" },
-          "400": { "description": "Champs invalides ou rÃ´le manquant" },
-          "401": { "description": "Non authentifiÃ©" },
-          "403": { "description": "Tentative d'Ã©lÃ©vation de privilÃ¨ges interdite" },
-          "409": { "description": "Email dÃ©jÃ  utilisÃ©" }
+          "201": {
+            "description": "Compte crÃ©Ã© avec succÃ¨s"
+          },
+          "400": {
+            "description": "Champs invalides ou rÃ´le manquant"
+          },
+          "401": {
+            "description": "Non authentifiÃ©"
+          },
+          "403": {
+            "description": "Tentative d'Ã©lÃ©vation de privilÃ¨ges interdite"
+          },
+          "409": {
+            "description": "Email dÃ©jÃ  utilisÃ©"
+          }
         }
       },
       "get": {
-        "tags": ["Utilisateurs"],
+        "tags": [
+          "Utilisateurs"
+        ],
         "summary": "Lister les utilisateurs (Admin ou Gestionnaire)",
-        "security": [{ "bearerAuth": [] }],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "responses": {
-          "200": { "description": "Liste des utilisateurs" },
-          "401": { "description": "Non authentifiÃ©" },
-          "403": { "description": "AccÃ¨s rÃ©servÃ© aux Admins et Gestionnaires" }
+          "200": {
+            "description": "Liste des utilisateurs"
+          },
+          "401": {
+            "description": "Non authentifiÃ©"
+          },
+          "403": {
+            "description": "AccÃ¨s rÃ©servÃ© aux Admins et Gestionnaires"
+          }
         }
       }
     },
     "/api/users/{id}/deactivate": {
       "patch": {
-        "tags": ["Utilisateurs"],
+        "tags": [
+          "Utilisateurs"
+        ],
         "summary": "DÃ©sactiver un compte utilisateur (Admin uniquement)",
-        "security": [{ "bearerAuth": [] }],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "parameters": [
-          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
         ],
         "responses": {
-          "200": { "description": "Utilisateur dÃ©sactivÃ© avec succÃ¨s" },
-          "403": { "description": "AccÃ¨s rÃ©servÃ© Ã  l'Admin" },
-          "404": { "description": "Utilisateur introuvable" },
-          "409": { "description": "Impossible de dÃ©sactiver le dernier Admin actif" }
+          "200": {
+            "description": "Utilisateur dÃ©sactivÃ© avec succÃ¨s"
+          },
+          "403": {
+            "description": "AccÃ¨s rÃ©servÃ© Ã  l'Admin"
+          },
+          "404": {
+            "description": "Utilisateur introuvable"
+          },
+          "409": {
+            "description": "Impossible de dÃ©sactiver le dernier Admin actif"
+          }
         }
       }
     },
     "/api/magasin": {
       "get": {
-        "tags": ["Magasins"],
+        "tags": [
+          "Magasins"
+        ],
         "summary": "Lister tous les magasins",
-        "security": [{ "bearerAuth": [] }],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "responses": {
-          "200": { "description": "Liste des magasins" }
+          "200": {
+            "description": "Liste des magasins"
+          }
         }
       },
       "post": {
-        "tags": ["Magasins"],
+        "tags": [
+          "Magasins"
+        ],
         "summary": "CrÃ©er un nouveau magasin (Admin uniquement)",
-        "security": [{ "bearerAuth": [] }],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
-              "schema": { "$ref": "#/components/schemas/MagasinInput" }
+              "schema": {
+                "$ref": "#/components/schemas/MagasinInput"
+              }
             }
           }
         },
         "responses": {
-          "201": { "description": "Magasin crÃ©Ã© avec succÃ¨s" },
-          "400": { "description": "Champs obligatoires manquants" },
-          "403": { "description": "AccÃ¨s rÃ©servÃ© Ã  l'Admin" }
+          "201": {
+            "description": "Magasin crÃ©Ã© avec succÃ¨s"
+          },
+          "400": {
+            "description": "Champs obligatoires manquants"
+          },
+          "403": {
+            "description": "AccÃ¨s rÃ©servÃ© Ã  l'Admin"
+          }
         }
       }
     },
     "/api/magasin/active": {
       "get": {
-        "tags": ["Magasins"],
+        "tags": [
+          "Magasins"
+        ],
         "summary": "Consulter les magasins actifs pour les rÃ©servations",
         "description": "Accessible Ã  tous les utilisateurs authentifiÃ©s.",
-        "security": [{ "bearerAuth": [] }],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "responses": {
-          "200": { "description": "Liste des magasins actifs" }
+          "200": {
+            "description": "Liste des magasins actifs"
+          }
         }
       }
     },
     "/api/magasin/{id}": {
       "get": {
-        "tags": ["Magasins"],
+        "tags": [
+          "Magasins"
+        ],
         "summary": "Consulter un magasin par son ID",
-        "security": [{ "bearerAuth": [] }],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "parameters": [
-          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
         ],
         "responses": {
-          "200": { "description": "DÃ©tails du magasin" },
-          "404": { "description": "Magasin introuvable" }
+          "200": {
+            "description": "DÃ©tails du magasin"
+          },
+          "404": {
+            "description": "Magasin introuvable"
+          }
         }
       },
       "put": {
-        "tags": ["Magasins"],
+        "tags": [
+          "Magasins"
+        ],
         "summary": "Modifier les informations d'un magasin (Admin)",
-        "security": [{ "bearerAuth": [] }],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "parameters": [
-          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
         ],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
-              "schema": { "$ref": "#/components/schemas/MagasinInput" }
+              "schema": {
+                "$ref": "#/components/schemas/MagasinInput"
+              }
             }
           }
         },
         "responses": {
-          "200": { "description": "Magasin modifiÃ© avec succÃ¨s" },
-          "403": { "description": "AccÃ¨s rÃ©servÃ© Ã  l'Admin" },
-          "404": { "description": "Magasin introuvable" }
+          "200": {
+            "description": "Magasin modifiÃ© avec succÃ¨s"
+          },
+          "403": {
+            "description": "AccÃ¨s rÃ©servÃ© Ã  l'Admin"
+          },
+          "404": {
+            "description": "Magasin introuvable"
+          }
         }
       },
       "delete": {
-        "tags": ["Magasins"],
+        "tags": [
+          "Magasins"
+        ],
         "summary": "DÃ©sactiver logiquement un magasin (Admin)",
-        "security": [{ "bearerAuth": [] }],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "parameters": [
-          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
         ],
         "responses": {
-          "200": { "description": "Magasin dÃ©sactivÃ© (isActive: false)" },
-          "403": { "description": "AccÃ¨s rÃ©servÃ© Ã  l'Admin" }
+          "200": {
+            "description": "Magasin dÃ©sactivÃ© (isActive: false)"
+          },
+          "403": {
+            "description": "AccÃ¨s rÃ©servÃ© Ã  l'Admin"
+          }
         }
       }
     },
     "/api/magasin/{id}/gestionnaire": {
       "patch": {
-        "tags": ["Magasins"],
+        "tags": [
+          "Magasins"
+        ],
         "summary": "Affecter un gestionnaire Ã  un magasin (Admin uniquement)",
-        "security": [{ "bearerAuth": [] }],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "parameters": [
-          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
         ],
         "requestBody": {
           "required": true,
@@ -404,135 +803,630 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["gestionnaireId"],
+                "required": [
+                  "gestionnaireId"
+                ],
                 "properties": {
-                  "gestionnaireId": { "type": "string", "example": "60d0fe4f5311236168a109ca" }
+                  "gestionnaireId": {
+                    "type": "string",
+                    "example": "60d0fe4f5311236168a109ca"
+                  }
                 }
               }
             }
           }
         },
         "responses": {
-          "200": { "description": "Affectation rÃ©ussie" },
-          "400": { "description": "L'utilisateur spÃ©cifiÃ© n'est pas un gestionnaire" },
-          "403": { "description": "AccÃ¨s rÃ©servÃ© Ã  l'Admin" }
+          "200": {
+            "description": "Affectation rÃ©ussie"
+          },
+          "400": {
+            "description": "L'utilisateur spÃ©cifiÃ© n'est pas un gestionnaire"
+          },
+          "403": {
+            "description": "AccÃ¨s rÃ©servÃ© Ã  l'Admin"
+          }
         }
       }
     },
     "/api/reservations": {
       "post": {
-        "tags": ["RÃ©servations"],
+        "tags": [
+          "RÃ©servations"
+        ],
         "summary": "CrÃ©er une rÃ©servation sans chevauchement",
         "description": "ContrÃ´le la durÃ©e (>0), la date dÃ©but dans le futur, l'appartenance du matÃ©riel au magasin sÃ©lectionnÃ© et l'absence de conflit de crÃ©neaux.",
-        "security": [{ "bearerAuth": [] }],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
-              "schema": { "$ref": "#/components/schemas/ReservationInput" }
+              "schema": {
+                "$ref": "#/components/schemas/ReservationInput"
+              }
             }
           }
         },
         "responses": {
-          "201": { "description": "RÃ©servation confirmÃ©e avec succÃ¨s" },
-          "400": { "description": "DurÃ©e nÃ©gative, date dans le passÃ© ou matÃ©riel indisponible" },
-          "404": { "description": "MatÃ©riel introuvable ou n'appartient pas au magasin" },
-          "409": { "description": "Ce matÃ©riel est dÃ©jÃ  rÃ©servÃ© sur ce crÃ©neau horaire" }
+          "201": {
+            "description": "RÃ©servation confirmÃ©e avec succÃ¨s"
+          },
+          "400": {
+            "description": "DurÃ©e nÃ©gative, date dans le passÃ© ou matÃ©riel indisponible"
+          },
+          "404": {
+            "description": "MatÃ©riel introuvable ou n'appartient pas au magasin"
+          },
+          "409": {
+            "description": "Ce matÃ©riel est dÃ©jÃ  rÃ©servÃ© sur ce crÃ©neau horaire"
+          }
         }
       },
       "get": {
-        "tags": ["RÃ©servations"],
+        "tags": [
+          "RÃ©servations"
+        ],
         "summary": "Consulter les rÃ©servations filtrÃ©es (Admin ou Gestionnaire)",
         "description": "Le gestionnaire accÃ¨de uniquement aux rÃ©servations de son magasin rattachÃ©.",
-        "security": [{ "bearerAuth": [] }],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "parameters": [
-          { "name": "statut", "in": "query", "schema": { "type": "string", "enum": ["CONFIRMEE", "EN_COURS", "TERMINEE", "ANNULEE"] } },
-          { "name": "materielId", "in": "query", "schema": { "type": "string" } }
+          {
+            "name": "statut",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "CONFIRMEE",
+                "EN_COURS",
+                "TERMINEE",
+                "ANNULEE"
+              ]
+            }
+          },
+          {
+            "name": "materielId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
         ],
         "responses": {
-          "200": { "description": "Liste filtrÃ©e des rÃ©servations" },
-          "403": { "description": "AccÃ¨s interdit Ã  un autre magasin" }
+          "200": {
+            "description": "Liste filtrÃ©e des rÃ©servations"
+          },
+          "403": {
+            "description": "AccÃ¨s interdit Ã  un autre magasin"
+          }
         }
       }
     },
     "/api/reservations/my": {
       "get": {
-        "tags": ["RÃ©servations"],
+        "tags": [
+          "RÃ©servations"
+        ],
         "summary": "Consulter l'historique et statut de mes rÃ©servations",
-        "security": [{ "bearerAuth": [] }],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "responses": {
-          "200": { "description": "Liste de mes rÃ©servations personnelles" }
+          "200": {
+            "description": "Liste de mes rÃ©servations personnelles"
+          }
         }
       }
     },
     "/api/reservations/{id}": {
       "delete": {
-        "tags": ["RÃ©servations"],
+        "tags": [
+          "RÃ©servations"
+        ],
         "summary": "Annuler une rÃ©servation confirmÃ©e avant son dÃ©but",
         "description": "LibÃ¨re le crÃ©neau pour les autres utilisateurs. RefusÃ©e si la date de dÃ©but est dÃ©jÃ  passÃ©e.",
-        "security": [{ "bearerAuth": [] }],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "parameters": [
-          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
         ],
         "responses": {
-          "200": { "description": "RÃ©servation annulÃ©e avec succÃ¨s" },
-          "400": { "description": "Impossible d'annuler : la date de dÃ©but est dÃ©jÃ  passÃ©e ou statut non CONFIRMEE" },
-          "404": { "description": "RÃ©servation introuvable" }
+          "200": {
+            "description": "RÃ©servation annulÃ©e avec succÃ¨s"
+          },
+          "400": {
+            "description": "Impossible d'annuler : la date de dÃ©but est dÃ©jÃ  passÃ©e ou statut non CONFIRMEE"
+          },
+          "404": {
+            "description": "RÃ©servation introuvable"
+          }
         }
       }
     },
-        "/api/reservations/{id}/handover": {
+    "/api/reservations/{id}/handover": {
       "post": {
-        "tags": ["Emprunts & Retours"],
+        "tags": [
+          "Emprunts & Retours"
+        ],
         "summary": "Enregistrer la remise physique du matériel (départ de l'emprunt)",
         "description": "Vérifie que la réservation est confirmée, appartient au magasin et passe le statut àà EN_COURS avec dateReelleSortie.",
-        "security": [{ "bearerAuth": [] }],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "parameters": [
-          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
         ],
         "responses": {
-          "200": { "description": "Remise du matériel enregistrée avec succès" },
-          "400": { "description": "Réservation non confirmée ou matériel déjà sorti" },
-          "403": { "description": "Gestionnaire non affecté à ce magasin" },
-          "404": { "description": "Réservation introuvable" }
+          "200": {
+            "description": "Remise du matériel enregistrée avec succès"
+          },
+          "400": {
+            "description": "Réservation non confirmée ou matériel déjà sorti"
+          },
+          "403": {
+            "description": "Gestionnaire non affecté à ce magasin"
+          },
+          "404": {
+            "description": "Réservation introuvable"
+          }
         }
       }
     },
     "/api/reservations/{id}/return": {
       "post": {
-        "tags": ["Emprunts & Retours"],
+        "tags": [
+          "Emprunts & Retours"
+        ],
         "summary": "Enregistrer le retour du matÃ©riel et constater son Ã©tat",
         "description": "Passe la rÃ©servation Ã  TERMINEE, stocke la date rÃ©elle de restitution et bascule automatiquement le matÃ©riel Ã  INDISPONIBLE si ENDOMMAGE.",
-        "security": [{ "bearerAuth": [] }],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "parameters": [
-          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
         ],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
-              "schema": { "$ref": "#/components/schemas/RetourInput" }
+              "schema": {
+                "$ref": "#/components/schemas/RetourInput"
+              }
             }
           }
         },
         "responses": {
-          "200": { "description": "Retour enregistrÃ© avec succÃ¨s" },
-          "400": { "description": "Ãtat de retour obligatoire ou rÃ©servation dÃ©jÃ  clÃ´turÃ©e" },
-          "403": { "description": "Gestionnaire non affectÃ© Ã  ce magasin" },
-          "404": { "description": "RÃ©servation introuvable" }
+          "200": {
+            "description": "Retour enregistrÃ© avec succÃ¨s"
+          },
+          "400": {
+            "description": "Ãtat de retour obligatoire ou rÃ©servation dÃ©jÃ  clÃ´turÃ©e"
+          },
+          "403": {
+            "description": "Gestionnaire non affectÃ© Ã  ce magasin"
+          },
+          "404": {
+            "description": "RÃ©servation introuvable"
+          }
         }
       }
     },
     "/api/borrowings/overdue": {
       "get": {
-        "tags": ["Emprunts & Retours"],
+        "tags": [
+          "Emprunts & Retours"
+        ],
         "summary": "Suivi des emprunts en retard (TOOL-52, TOOL-53)",
         "description": "Retourne la liste des emprunts (statut EN_COURS) dont la date de fin prevue est depassee. Le gestionnaire accede uniquement a son magasin.",
-        "security": [{ "bearerAuth": [] }],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "responses": {
-          "200": { "description": "Liste des emprunts en retard avec calcul du retard" },
-          "401": { "description": "Non authentifie" },
-          "403": { "description": "Acces interdit (role non autorise ou gestionnaire non affecte a un magasin)" }
+          "200": {
+            "description": "Liste des emprunts en retard avec calcul du retard"
+          },
+          "401": {
+            "description": "Non authentifie"
+          },
+          "403": {
+            "description": "Acces interdit (role non autorise ou gestionnaire non affecte a un magasin)"
+          }
+        }
+      }
+    },
+    "/api/materials": {
+      "post": {
+        "tags": [
+          "Matériels"
+        ],
+        "summary": "Créer un nouveau matériel (TOOL-31, TOOL-97)",
+        "description": "Crée un matériel avec référence physique unique normalisée (referenceKey). Admin doit spécifier magasinId; Gestionnaire crée automatiquement dans son magasin.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MaterialInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Matériel créé avec succès"
+          },
+          "400": {
+            "description": "Données invalides ou magasin requis manquant"
+          },
+          "401": {
+            "description": "Authentification requise"
+          },
+          "403": {
+            "description": "Accès refusé (droits insuffisants ou gestionnaire sans magasin)"
+          },
+          "409": {
+            "description": "Conflit: une référence matériel identique existe déjà"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Matériels"
+        ],
+        "summary": "Lister les matériels (TOOL-29, TOOL-95)",
+        "description": "Retourne la liste des matériels. Admin voit tous les magasins; Gestionnaire ne voit que les matériels de son magasin assigné.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "isActive",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": true
+            },
+            "description": "Filtrer par état d activation (défaut: true)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste des matériels retournée avec succès"
+          },
+          "400": {
+            "description": "Paramètre de requête invalide"
+          },
+          "401": {
+            "description": "Authentification requise"
+          },
+          "403": {
+            "description": "Accès refusé"
+          }
+        }
+      }
+    },
+    "/api/materials/{id}": {
+      "get": {
+        "tags": [
+          "Matériels"
+        ],
+        "summary": "Consulter un matériel par ID (TOOL-29, TOOL-95)",
+        "description": "Retourne les détails d un matériel. Soumis au cloisonnement magasin (storeScopeMiddleware).",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Identifiant ObjectId du matériel"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Matériel trouvé"
+          },
+          "400": {
+            "description": "Format d identifiant invalide"
+          },
+          "401": {
+            "description": "Authentification requise"
+          },
+          "403": {
+            "description": "Accès refusé: matériel d un autre magasin"
+          },
+          "404": {
+            "description": "Matériel introuvable"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Matériels"
+        ],
+        "summary": "Modifier un matériel (TOOL-31, TOOL-97)",
+        "description": "Met à jour les informations modifiables d un matériel. Soumis au storeScopeMiddleware.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Identifiant ObjectId du matériel"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "reference": {
+                    "type": "string"
+                  },
+                  "nom": {
+                    "type": "string"
+                  },
+                  "categorie": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Matériel mis à jour"
+          },
+          "400": {
+            "description": "Champs non autorisés ou invalides"
+          },
+          "401": {
+            "description": "Authentification requise"
+          },
+          "403": {
+            "description": "Accès refusé: matériel d un autre magasin"
+          },
+          "404": {
+            "description": "Matériel introuvable"
+          },
+          "409": {
+            "description": "Conflit: la nouvelle référence existe déjà"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Matériels"
+        ],
+        "summary": "Désactiver logiquement un matériel (TOOL-29, TOOL-95)",
+        "description": "Désactive le matériel sans le supprimer de la base de données afin de conserver l historique.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Identifiant ObjectId du matériel"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Matériel désactivé logiquement avec succès"
+          },
+          "400": {
+            "description": "Format d identifiant invalide"
+          },
+          "401": {
+            "description": "Authentification requise"
+          },
+          "403": {
+            "description": "Accès refusé: matériel d un autre magasin"
+          },
+          "404": {
+            "description": "Matériel introuvable"
+          }
+        }
+      }
+    },
+    "/api/materials/{id}/activation": {
+      "patch": {
+        "tags": [
+          "Matériels"
+        ],
+        "summary": "Activer ou désactiver un matériel",
+        "description": "Permet de basculer l état isActive d un matériel.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Identifiant ObjectId du matériel"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MaterialActivationInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Activation mise à jour"
+          },
+          "400": {
+            "description": "Champ isActive boolean requis"
+          },
+          "401": {
+            "description": "Authentification requise"
+          },
+          "403": {
+            "description": "Accès refusé"
+          },
+          "404": {
+            "description": "Matériel introuvable"
+          }
+        }
+      }
+    },
+    "/api/materials/{id}/status": {
+      "patch": {
+        "tags": [
+          "Matériels"
+        ],
+        "summary": "Mettre à jour le statut opérationnel / maintenance (TOOL-98)",
+        "description": "Permet à un gestionnaire ou administrateur de passer un matériel en INDISPONIBLE (maintenance) ou DISPONIBLE.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Identifiant ObjectId du matériel"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MaterialStatusInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Statut du matériel mis à jour avec succès"
+          },
+          "400": {
+            "description": "Statut invalide ou matériel inactif"
+          },
+          "401": {
+            "description": "Authentification requise"
+          },
+          "403": {
+            "description": "Accès refusé: matériel d un autre magasin"
+          },
+          "404": {
+            "description": "Matériel introuvable"
+          }
+        }
+      }
+    },
+    "/api/reservations/overdue": {
+      "get": {
+        "tags": [
+          "Emprunts & Retours"
+        ],
+        "summary": "Consulter les emprunts en retard (TOOL-52, TOOL-53 alias)",
+        "description": "Alias de /api/borrowings/overdue. Filtre les réservations EN_COURS dont dateFin < maintenant.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste des emprunts en retard"
+          },
+          "401": {
+            "description": "Authentification requise"
+          },
+          "403": {
+            "description": "Accès réservé aux Gestionnaires et Admins"
+          }
         }
       }
     }

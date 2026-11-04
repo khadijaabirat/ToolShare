@@ -65,6 +65,13 @@ describe('KeyedMutex & withLock (TOOL-38, TOOL-39)', () => {
     assert.equal(result, 'recovered');
   });
 
+  test('cleans up completed key from chains map to prevent memory leaks', async () => {
+    const mutex = new KeyedMutex();
+    const result = await mutex.withLock('cleanupKey', async () => 'done');
+    assert.equal(result, 'done');
+    assert.equal(mutex.chains.has('cleanupKey'), false);
+  });
+
   test('default withLock export works as expected', async () => {
     const res = await withLock('defaultKey', async () => 42);
     assert.equal(res, 42);
