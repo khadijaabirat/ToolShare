@@ -70,8 +70,14 @@ return await Reservation.findById(id);
         { new: true, runValidators: true }
     );
     if (reservation && reservation.materielId) {
-        await materielRepository.updateFields
-        (reservation.materielId, statutToSave);
+        if (etatRetour === 'ENDOMMAGE') {
+            await materielRepository.updateFields(reservation.materielId, 'INDISPONIBLE');
+        } else {
+            const currentMat = await materielRepository.findById(reservation.materielId);
+            if (!currentMat || currentMat.statut !== 'INDISPONIBLE') {
+                await materielRepository.updateFields(reservation.materielId, statutToSave);
+            }
+        }
     }
     return reservation;
    }
