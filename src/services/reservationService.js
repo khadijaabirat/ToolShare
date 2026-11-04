@@ -1,3 +1,4 @@
+const { withLock } = require('../utils/atomicLock');
 const magasinRepository = require("../repositories/magasinRepository");
 const materielRepository = require("../repositories/materielRepository");
 const reservationRepository = require("../repositories/reservationRepository");
@@ -68,9 +69,41 @@ async createReservation({userId,magasinId,materielId,dateDebut,dureeHeures}){
         err.statusCode=400;
         throw err; 
     }
-    if(await this.checkAvailability(materielId,dates.dateDebut,dates.dateFin)){
-        return await reservationRepository.createReservation({userId,magasinId,materielId, ...dates});
-    }
+    return await withLock(materielId, async () => {
+        let session = null;
+        try {
+            const mongoose = require('mongoose');
+            if (mongoose.connection && mongoose.connection.readyState === 1 && typeof mongoose.startSession === 'function') {
+                try {
+                    session = await mongoose.startSession();
+                    session.startTransaction();
+                } catch (_) {
+                    session = null;
+                }
+            }
+
+            await this.checkAvailability(materielId, dates.dateDebut, dates.dateFin, session);
+
+            const reservation = await reservationRepository.createReservation(
+                { userId, magasinId, materielId, ...dates },
+                session
+            );
+
+            if (session) {
+                await session.commitTransaction();
+            }
+            return reservation;
+        } catch (err) {
+            if (session) {
+                try { await session.abortTransaction(); } catch (_) {}
+            }
+            throw err;
+        } finally {
+            if (session) {
+                try { session.endSession(); } catch (_) {}
+            }
+        }
+    });
 }
 
 async getMyReservation(userId){
